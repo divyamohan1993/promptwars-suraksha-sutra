@@ -399,6 +399,17 @@ a {
   font-weight: 800;
   text-align: center;
 }
+.demo-focus {
+  position: relative;
+  outline: 4px solid #f4b942;
+  outline-offset: 5px;
+  box-shadow:
+    0 0 0 8px #f4b94230,
+    0 1rem 2.5rem #102d2530 !important;
+  transition:
+    outline-color 180ms ease,
+    box-shadow 180ms ease;
+}
 .field {
   display: grid;
   gap: 0.35rem;

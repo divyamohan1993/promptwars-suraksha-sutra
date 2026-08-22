@@ -532,7 +532,20 @@ export class App implements OnInit {
   }
 
   private demoScroll(selector: string): void {
-    document.querySelector(selector)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.querySelectorAll('.demo-focus').forEach((element) => {
+      element.classList.remove('demo-focus');
+    });
+    const element = document.querySelector(selector);
+    const target = element?.closest('section, article') ?? element;
+    if (!(target instanceof HTMLElement)) return;
+    target.classList.add('demo-focus');
+    const centerTarget = (): void => {
+      const top = target.getBoundingClientRect().top + window.scrollY;
+      const viewportOffset = Math.max(72, (window.innerHeight - target.offsetHeight) / 2);
+      window.scrollTo({ top: Math.max(0, top - viewportOffset), behavior: 'smooth' });
+    };
+    window.requestAnimationFrame(centerTarget);
+    window.setTimeout(centerTarget, 350);
   }
 
   async signOut(): Promise<void> {
