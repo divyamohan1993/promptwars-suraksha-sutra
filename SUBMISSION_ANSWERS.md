@@ -1,0 +1,9 @@
+# Submission Answers
+
+## Q1. Describe the changes/updates made in the deployed version
+
+The deployed SurakshaSutra release is a complete adaptive digital-safety learning journey for Indian households. It adds Google and evaluator login, three isolated learner profiles, learner-controlled language/accessibility/consent settings, a confidence-aware diagnostic, deterministic misconception and mastery updates, explainable Quick/Deep/Low-Energy routes, a five-level scaffold dial, safe fictional simulations with transfer scenarios, structured teach-back, Memory Radar review scheduling, persisted analytics, and an auditable System Evidence Drawer. State persists in Firestore after refresh and reauthentication. The release also adds truthful AI fallback, evaluator reset controls, public test credentials, HTTPS deployment on Google Compute Engine, CSP/authentication fixes, and automated contract, safety, adaptive-engine, API, and UI tests.
+
+## Q2. Mention the Gen AI services utilized in the submission, and where did you utilize it?
+
+We use Google Vertex AI with the `gemini-3.5-flash-lite` model. In the adaptive lesson, Vertex AI rewrites approved digital-safety explanations for the selected learner's language, reading complexity, explanation depth, route, scaffold level, and verified misconception. In Teach-Back, it converts the learner's explanation into schema-validated correct claims, partial claims, missing links, misconceptions, severity, and one targeted follow-up question. Deterministic application code—not the model—controls authentication, profile isolation, mastery, uncertainty, route eligibility, misconceptions, review scheduling, and analytics. Every model response is bounded, schema-validated, safety-checked, and logged with provider, model, request ID, latency, sources, and fallback status. A labelled curated fallback completes the journey if the model fails.
