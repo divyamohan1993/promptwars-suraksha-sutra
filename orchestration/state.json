@@ -1,7 +1,7 @@
 {
   "project": "SurakshaSutra",
-  "updatedAt": "2026-08-22T07:21:30Z",
-  "phase": "wave-a-analysis",
+  "updatedAt": "2026-08-22T07:23:51Z",
+  "phase": "wave-b-foundation",
   "releaseStatus": "blocked",
   "releaseBlockers": [
     "Application code and deployment artifacts do not yet exist.",
@@ -50,8 +50,9 @@
     ]
   },
   "contracts": {
-    "status": "not-frozen",
-    "owner": "unassigned"
+    "status": "policy-frozen-schemas-pending",
+    "owner": "B2-contract-agent",
+    "changeRule": "Only B2 may change public contracts until Sol marks the schema package frozen."
   },
   "tasks": [
     {
@@ -60,7 +61,8 @@
       "model": "gpt-5.6-luna",
       "effort": "max",
       "ownership": "read-only",
-      "status": "in_progress"
+      "status": "completed",
+      "result": "P0 traceability, proposed contracts, deterministic formula boundaries, safety invariants, and exact acceptance assertions delivered to Sol."
     },
     {
       "taskId": "A2",
@@ -68,7 +70,8 @@
       "model": "gpt-5.6-luna",
       "effort": "max",
       "ownership": "read-only",
-      "status": "in_progress"
+      "status": "completed",
+      "result": "P0 information architecture, bilingual Savita journey, WCAG interaction contract, truthful state badges, and accessibility assertions delivered to Sol."
     },
     {
       "taskId": "A3",
@@ -76,7 +79,17 @@
       "model": "gpt-5.6-luna",
       "effort": "max",
       "ownership": "read-only",
-      "status": "in_progress"
+      "status": "completed",
+      "result": "GCE topology, Firebase/profile authorization, Firestore model, Vertex boundary, environment contract, IAM plan, deployment sequence, and threat inputs delivered to Sol."
+    },
+    {
+      "taskId": "A4",
+      "agent": "/root/wave_a_architecture",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "ownership": "read-only",
+      "status": "stopped",
+      "result": "Stopped after redundant long-running review; Sol completed architecture synthesis from A1-A3 and direct audit."
     }
   ],
   "tests": [],
