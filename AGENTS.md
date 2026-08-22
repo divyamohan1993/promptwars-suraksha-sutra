@@ -1,6 +1,14 @@
 # AGENTS.md
 
-DO NOT OVERCOMPLICATE. WHATEVER IS REQUIRED DO IT DIRECTLY. DO NOT OVERTHINK. IF YOU NEED SOMETHING ASK.
+You are working on the gcloud vm directly.
+
+DO NOT OVERCOMPLICATE. WHATEVER IS REQUIRED DO IT DIRECTLY. DO NOT OVERTHINK. IF YOU NEED SOMETHING ASK. 
+
+you can also read .env and bring its contents to the chat. I will rotate the cred later. Use one click login by google. Make the application live at priority while adhering to all the things. Test is last. Do not hardcode any values. Use environment variables.
+
+Fetch and put all the values in .env file. You can bring any keys inside context. I will rotate them all later. Do not publish any key in the github.
+
+Use anything of the gcloud to deploy this.
 
 ## 0. Authority
 
