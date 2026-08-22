@@ -1,18 +1,16 @@
 {
   "project": "SurakshaSutra",
-  "updatedAt": "2026-08-22T07:54:50Z",
-  "phase": "wave-b-foundation",
-  "releaseStatus": "blocked",
+  "updatedAt": "2026-08-22T08:18:00Z",
+  "phase": "release-verification",
+  "releaseStatus": "deployed-candidate",
   "releaseBlockers": [
-    "The application foundation is not yet integrated into main.",
-    "The connected P0 API and frontend journey are not yet implemented.",
-    "Application deployment has not yet been built or started."
+    "The live evaluator journey passed once; the formal three-consecutive-run sign-off remains outstanding."
   ],
   "repositoryAudit": {
     "branch": "main",
-    "head": "fd0bb0595890f7fad2772d30f7fe9cf7015eef04",
+    "head": "0516aa6",
     "worktree": "clean; ignored .env mode 0600",
-    "sourceState": "foundation implementation in progress",
+    "sourceState": "connected P0 application deployed and live-verified",
     "packageManager": "pnpm 11.22.0",
     "buildCommands": ["packages/contracts: pnpm build"],
     "testCommands": ["packages/contracts: pnpm typecheck && pnpm test"],
@@ -153,7 +151,10 @@
       "branch": "agent/c2-p0-api",
       "worktree": "/home/divyamohan1993/promptwars-worktrees/c2-p0-api",
       "ownership": "apps/api only",
-      "status": "in_progress"
+      "status": "completed-integrated",
+      "commit": "1157d5e",
+      "integratedCommit": "7be373f",
+      "verification": "API typecheck, 6 tests, build, Firebase, Firestore, Vertex, fallback, persistence, and isolation passed."
     },
     {
       "taskId": "C3",
@@ -163,7 +164,10 @@
       "branch": "agent/c3-p0-web",
       "worktree": "/home/divyamohan1993/promptwars-worktrees/c3-p0-web",
       "ownership": "apps/web only",
-      "status": "in_progress"
+      "status": "completed-integrated",
+      "commit": "125d92f",
+      "integratedCommit": "9012e53",
+      "verification": "Angular typecheck, 2 tests, build, and public browser login through lesson/simulator delivery passed."
     }
   ],
   "tests": [
@@ -194,6 +198,20 @@
       "status": "passed",
       "evidence": "22/22 deterministic-policy tests; 91.35% lines; 97.72% functions",
       "verifiedAt": "2026-08-22T07:54:50Z"
+    },
+    {
+      "scope": "deployed P0 evaluator journey",
+      "command": "public HTTPS Firebase login and authenticated API/browser journey",
+      "status": "passed",
+      "evidence": "Three profiles; severity 0.975 misconception; live Vertex in 2408ms; base and transfer; teach-back; mastery 0.725375; Memory Radar; 18 events; 6 metrics; fallback; persistence; isolation; browser no errors.",
+      "verifiedAt": "2026-08-22T08:15:00Z"
+    },
+    {
+      "scope": "full integrated workspace",
+      "command": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+      "status": "passed",
+      "evidence": "Formatting and lint clean; all package typechecks and builds pass; 60 tests pass across contracts, curriculum, adaptive engine, API, and web.",
+      "verifiedAt": "2026-08-22T08:18:00Z"
     }
   ],
   "cloudResources": {
@@ -229,7 +247,14 @@
       "issuedAt": "2026-08-22T07:28:16Z",
       "expiresOn": "2026-11-20",
       "autoRenewal": true,
-      "status": "provisioned-not-yet-serving-application"
+      "status": "active-serving-application"
+    },
+    {
+      "kind": "gce-container-release",
+      "host": "suraksha.34-0-15-183.sslip.io",
+      "commit": "0516aa6",
+      "deployedAt": "2026-08-22T08:13:00Z",
+      "status": "healthy-live-verified"
     }
   ],
   "defectCounts": {

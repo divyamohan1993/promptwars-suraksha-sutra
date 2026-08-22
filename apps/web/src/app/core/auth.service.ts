@@ -1,10 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import {
-  getApps,
-  initializeApp,
-  type FirebaseApp,
-  type FirebaseOptions,
-} from 'firebase/app';
+import { getApps, initializeApp, type FirebaseApp, type FirebaseOptions } from 'firebase/app';
 import {
   getAuth,
   GoogleAuthProvider,
@@ -27,11 +22,6 @@ export type PublicRuntimeConfig = {
     readonly location?: string;
   };
   readonly featureFlags?: Record<string, boolean>;
-};
-
-type ConfigEnvelope = PublicRuntimeConfig & {
-  readonly firebaseConfig?: FirebaseOptions;
-  readonly data?: PublicRuntimeConfig & { readonly firebaseConfig?: FirebaseOptions };
 };
 
 const requiredFirebaseKeys = ['apiKey', 'appId', 'projectId'] as const;
@@ -105,15 +95,18 @@ export class AuthService {
           appVersion: typeof record.appVersion === 'string' ? record.appVersion : undefined,
           model: isRecord(record.model)
             ? {
-                provider: typeof record.model.provider === 'string' ? record.model.provider : undefined,
-                modelId: typeof record.model.modelId === 'string' ? record.model.modelId : undefined,
-                location: typeof record.model.location === 'string' ? record.model.location : undefined,
+                provider:
+                  typeof record.model.provider === 'string' ? record.model.provider : undefined,
+                modelId:
+                  typeof record.model.modelId === 'string' ? record.model.modelId : undefined,
+                location:
+                  typeof record.model.location === 'string' ? record.model.location : undefined,
               }
             : undefined,
           featureFlags: isRecord(record.featureFlags)
-            ? Object.fromEntries(
+            ? (Object.fromEntries(
                 Object.entries(record.featureFlags).filter(([, flag]) => typeof flag === 'boolean'),
-              ) as Record<string, boolean>
+              ) as Record<string, boolean>)
             : undefined,
         };
         this.initializeFirebase(options);
@@ -123,7 +116,9 @@ export class AuthService {
       })
       .catch((error: unknown) => {
         this.configState.set('error');
-        this.configError.set(error instanceof Error ? error.message : 'Configuration could not load.');
+        this.configError.set(
+          error instanceof Error ? error.message : 'Configuration could not load.',
+        );
         this.configPromise = null;
         throw error;
       });
@@ -186,4 +181,3 @@ export class AuthService {
     return this.auth;
   }
 }
-

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
 import { AuthService, type PublicRuntimeConfig } from './auth.service';
 
@@ -27,12 +27,17 @@ const asApiFailure = (body: unknown, status: number): ApiFailure => {
   const envelope = isRecord(body) && isRecord(body.error) ? body.error : body;
   const message =
     (isRecord(envelope) && typeof envelope.message === 'string' && envelope.message) ||
-    (status === 401 ? 'Your session expired. Please sign in again.' : 'The service could not complete that step.');
+    (status === 401
+      ? 'Your session expired. Please sign in again.'
+      : 'The service could not complete that step.');
   const error = new Error(message) as ApiFailure;
   Object.defineProperties(error, {
-    code: { value: isRecord(envelope) && typeof envelope.code === 'string' ? envelope.code : undefined },
+    code: {
+      value: isRecord(envelope) && typeof envelope.code === 'string' ? envelope.code : undefined,
+    },
     traceId: {
-      value: isRecord(envelope) && typeof envelope.traceId === 'string' ? envelope.traceId : undefined,
+      value:
+        isRecord(envelope) && typeof envelope.traceId === 'string' ? envelope.traceId : undefined,
     },
     status: { value: status },
   });
@@ -42,8 +47,7 @@ const asApiFailure = (body: unknown, status: number): ApiFailure => {
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private runtimeConfig: PublicRuntimeConfig | null = null;
-
-  constructor(private readonly auth: AuthService) {}
+  private readonly auth = inject(AuthService);
 
   setRuntimeConfig(config: PublicRuntimeConfig): void {
     this.runtimeConfig = config;
@@ -109,4 +113,3 @@ export class ApiService {
     return this.request('/evaluator/reset', { method: 'POST', body: {} });
   }
 }
-

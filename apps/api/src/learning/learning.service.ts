@@ -19,16 +19,10 @@ import {
   type AnalyticsMetric,
   type ConstitutionRecord,
   type HouseholdRecord,
-  type LearnerState,
-  type Misconception,
   type ProfileRecord,
-  type Recommendation,
-  type ReviewSchedule,
 } from '@suraksha-sutra/contracts';
 import {
   BASE_SCENARIO_ID,
-  baseScenario,
-  contractConcepts,
   contractScenarios,
   profileCopy,
   scenarioById,
@@ -37,12 +31,7 @@ import {
 
 import { getRuntimeEnvironment, type RuntimeEnvironment } from '../config/runtime-environment';
 import type { AuthenticatedUser } from '../auth/auth.types';
-import type {
-  EvidenceRecord,
-  HouseholdBundle,
-  PersistedProfile,
-  DataRepository,
-} from '../data/data.types';
+import type { HouseholdBundle, PersistedProfile, DataRepository } from '../data/data.types';
 import { DATA_REPOSITORY } from '../data/repository.token';
 import { VertexGateway } from '../ai/vertex.gateway';
 import {
@@ -62,10 +51,6 @@ import {
   explanationRequestSchema,
   scenarioRequestSchema,
   teachBackRequestSchema,
-  type DiagnosticRequest,
-  type ExplanationRequest,
-  type ScenarioRequest,
-  type TeachBackRequest,
 } from './input.schemas';
 
 const SEEDED_STATE_LABEL = 'Seeded starting state';

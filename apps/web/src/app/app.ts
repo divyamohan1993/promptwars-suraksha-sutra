@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { JsonPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import type { OnInit } from '@angular/core';
@@ -378,10 +378,8 @@ export class App implements OnInit {
   readonly languageOptions = languages;
   readonly contextOptions = contexts;
 
-  constructor(
-    readonly auth: AuthService,
-    private readonly api: ApiService,
-  ) {}
+  readonly auth = inject(AuthService);
+  private readonly api = inject(ApiService);
 
   ngOnInit(): void {
     void this.prepareApplication();

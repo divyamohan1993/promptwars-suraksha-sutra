@@ -203,4 +203,3 @@ export type BootstrapPayload = {
 export type ApiResponse = {
   readonly [key: string]: unknown;
 };
-

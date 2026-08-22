@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-22T07:50:00Z",
+  "updatedAt": "2026-08-22T08:15:00Z",
   "defects": [
     {
       "id": "SEC-001",
@@ -14,6 +14,27 @@
       "status": "closed",
       "title": "Web container restart caused by over-restrictive capability drop",
       "evidence": "nginx could not initialize cache directories with all capabilities dropped; retained no-new-privileges for web, rebuilt/recreated it, and loopback HTTP became healthy."
+    },
+    {
+      "id": "INTEGRATION-001",
+      "severity": "high",
+      "status": "closed",
+      "title": "Angular compact payloads did not match strict API inputs",
+      "evidence": "Bounded normalization and approved delivery paths now pass public browser verification."
+    },
+    {
+      "id": "DATA-001",
+      "severity": "high",
+      "status": "closed",
+      "title": "Firestore rejected optional undefined event fields",
+      "evidence": "Firestore optional-property handling enabled; the live diagnostic through reauthentication now persists."
+    },
+    {
+      "id": "CSP-001",
+      "severity": "high",
+      "status": "closed",
+      "title": "Google authentication inline handler was blocked by edge CSP",
+      "evidence": "Allowed authentication-provider inline bootstrap execution while retaining self-only defaults, no objects, denied framing, restricted Google script/frame/connect origins, and all other edge controls; reloaded nginx and verified the public header."
     }
   ]
 }

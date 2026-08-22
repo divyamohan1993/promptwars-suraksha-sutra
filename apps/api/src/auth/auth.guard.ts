@@ -1,10 +1,5 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import type { CanActivate, ExecutionContext } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 
 import { FirebaseAdminService } from './firebase-admin.service';
 import type { AuthenticatedRequest } from './auth.types';

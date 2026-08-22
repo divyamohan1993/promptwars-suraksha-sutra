@@ -83,3 +83,13 @@
 - Received C1 commit `c0b60e50c0250784cb2209484a1d66b462269b26`, inspected its full public API and ownership, and integrated it as `27069b1`.
 - Independently passed strict typechecking, 22 deterministic-policy tests with 91.35% line and 97.72% function coverage, and the package build. Model-provided mastery is rejected by the engine boundary.
 - Used the browser-verification workflow on the local production-shaped web container: page content rendered, no framework overlay or browser errors appeared, interactive semantics were present, and a screenshot was inspected. Full journey verification remains gated on C2/C3 integration.
+
+## 2026-08-22T08:15:00Z — P0 release deployed and live-verified
+
+- Integrated the authenticated Firestore/Vertex API and connected Angular evaluator workspace, then resolved module-runtime and client/API normalization defects.
+- Passed API typecheck, 6 tests, and build; web typecheck, 2 tests, and build; contract, curriculum, and adaptive-engine builds.
+- Deployed commit `0516aa6` to `https://suraksha.34-0-15-183.sslip.io`; both containers are healthy behind trusted HTTPS.
+- Live Firebase login returned three isolated profiles. The journey produced an incorrect-confident diagnostic, severity 0.975 misconception, Deep Route, scaffold 2, review, and a real `gemini-3.5-flash-lite` result in 2408ms.
+- Base and transfer scenarios, teach-back, deterministic mastery, Memory Radar, 18 persisted events, 6 metrics, reauthentication, profile isolation, and truthful forced fallback passed.
+- Real-browser login through live lesson and labelled simulator delivery passed with no browser errors.
+- Closed the reported Google authentication CSP violation by allowing inline authentication bootstrap execution only within the already restricted script policy; verified the active public response header after nginx reload.
