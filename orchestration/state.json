@@ -1,6 +1,6 @@
 {
   "project": "SurakshaSutra",
-  "updatedAt": "2026-08-22T07:43:10Z",
+  "updatedAt": "2026-08-22T07:47:00Z",
   "phase": "wave-b-foundation",
   "releaseStatus": "blocked",
   "releaseBlockers": [
@@ -131,6 +131,36 @@
       "commit": "8936a73976f1d965f999ab7815d258aad23abb23",
       "integratedCommit": "05dcb37",
       "verification": "Sol inspected the complete diff and safety boundary; combined workspace gates pending after formatting integration."
+    },
+    {
+      "taskId": "C1",
+      "agent": "/root/wave_c_adaptive",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "branch": "agent/c1-adaptive-engine",
+      "worktree": "/home/divyamohan1993/promptwars-worktrees/c1-adaptive-engine",
+      "ownership": "packages/adaptive-engine only",
+      "status": "in_progress"
+    },
+    {
+      "taskId": "C2",
+      "agent": "/root/wave_c_api",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "branch": "agent/c2-p0-api",
+      "worktree": "/home/divyamohan1993/promptwars-worktrees/c2-p0-api",
+      "ownership": "apps/api only",
+      "status": "in_progress"
+    },
+    {
+      "taskId": "C3",
+      "agent": "/root/wave_c_web",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "branch": "agent/c3-p0-web",
+      "worktree": "/home/divyamohan1993/promptwars-worktrees/c3-p0-web",
+      "ownership": "apps/web only",
+      "status": "in_progress"
     }
   ],
   "tests": [

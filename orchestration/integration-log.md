@@ -65,3 +65,9 @@
 - Received B1 commit `c6ad8718ee8b651f533a18cc10b0c66c663f56f2`, inspected root/app/CI changes and credential patterns, independently passed frozen install, format, lint, typecheck, four tests, and Angular/Nest production builds, then integrated it as `35a7aab`.
 - Received B3 commit `8936a73976f1d965f999ab7815d258aad23abb23`, inspected all curriculum-only paths plus the fail-closed safety validator, and integrated it as `05dcb37` after contracts were frozen.
 - Removed the Contract Agent's standalone package lock/workspace files, regenerated the single root lockfile, normalized the public `.env.example` to the accepted `.env` runtime contract, and formatted integrated contract sources under the root policy.
+
+## 2026-08-22T07:47:00Z — Connected P0 implementation wave started
+
+- Created isolated branches/worktrees and spawned Luna Max C1 for the deterministic adaptive engine, C2 for the authenticated Firestore/Vertex API, and C3 for the connected Angular evaluator UI. Ownership is disjoint and frozen contracts remain read-only.
+- Added local production API/web container definitions, loopback-only port bindings, health checks, an HTTPS-gated deployment script, and explicit `.dockerignore` protection for `.env`.
+- Added the repository threat model and severity policy covering the browser, authentication/profile isolation, deterministic engine, Firestore, Vertex, evaluator controls, analytics, secret handling, and deployment boundaries.

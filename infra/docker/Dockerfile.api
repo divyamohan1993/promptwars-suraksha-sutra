@@ -1,0 +1,25 @@
+FROM node:22.22.1-bookworm-slim AS build
+
+ENV PNPM_HOME=/pnpm
+ENV PATH=$PNPM_HOME:$PATH
+RUN corepack enable && corepack prepare pnpm@11.22.0 --activate
+WORKDIR /app
+COPY . .
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter @suraksha-sutra/contracts build \
+  && pnpm --filter @surakshasutra/curriculum build \
+  && if pnpm --filter @suraksha-sutra/adaptive-engine exec true >/dev/null 2>&1; then pnpm --filter @suraksha-sutra/adaptive-engine build; fi \
+  && pnpm --filter @surakshasutra/api build
+
+FROM node:22.22.1-bookworm-slim AS runtime
+ENV NODE_ENV=production
+WORKDIR /app
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/apps/api/node_modules ./apps/api/node_modules
+COPY --from=build /app/apps/api/dist ./apps/api/dist
+COPY --from=build /app/apps/api/package.json ./apps/api/package.json
+COPY --from=build /app/packages ./packages
+USER node
+EXPOSE 3000
+CMD ["node", "apps/api/dist/main.js"]
+
