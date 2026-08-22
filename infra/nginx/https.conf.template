@@ -3,12 +3,54 @@ server {
     listen [::]:80;
     server_name __PUBLIC_HOST__;
 
+    server_tokens off;
+    client_max_body_size 64k;
+
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;
     }
 
-    location / {
+    # Cloudflare Flexible terminates HTTPS at the edge and forwards HTTP with
+    # CF-Visitor set to https. Serve that request without creating a redirect
+    # loop, while redirecting direct plaintext traffic.
+    if ($http_cf_visitor !~* '"scheme":"https"') {
         return 308 https://$host$request_uri;
+    }
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Permissions-Policy "camera=(), geolocation=(), microphone=()" always;
+    add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://accounts.google.com; connect-src 'self' https://*.googleapis.com https://securetoken.googleapis.com; frame-src https://accounts.google.com https://*.firebaseapp.com" always;
+
+    location = /healthz {
+        proxy_pass http://127.0.0.1:3000/api/v1/health;
+        proxy_set_header Host $host;
+        proxy_set_header X-Request-ID $request_id;
+    }
+
+    location /api/ {
+        limit_except GET POST PUT PATCH DELETE OPTIONS { deny all; }
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Request-ID $request_id;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 15s;
+        proxy_send_timeout 15s;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Request-ID $request_id;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 15s;
     }
 }
 
