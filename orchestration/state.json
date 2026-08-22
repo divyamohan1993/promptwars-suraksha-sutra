@@ -1,6 +1,6 @@
 {
   "project": "SurakshaSutra",
-  "updatedAt": "2026-08-22T08:18:00Z",
+  "updatedAt": "2026-08-22T18:33:00Z",
   "phase": "release-verification",
   "releaseStatus": "deployed-candidate",
   "releaseBlockers": [
@@ -8,7 +8,7 @@
   ],
   "repositoryAudit": {
     "branch": "main",
-    "head": "0516aa6",
+    "head": "61509b1",
     "worktree": "clean; ignored .env mode 0600",
     "sourceState": "connected P0 application deployed and live-verified",
     "packageManager": "pnpm 11.22.0",
@@ -24,7 +24,7 @@
       "machineType": "n2-standard-4",
       "httpTagsPresent": true,
       "servicesListening": [22, 80],
-      "publicHost": "suraksha.34-0-15-183.sslip.io",
+      "publicHost": "sutra.dmj.one",
       "tlsCertificateExpiresOn": "2026-11-20"
     },
     "environment": {
@@ -168,6 +168,16 @@
       "commit": "125d92f",
       "integratedCommit": "9012e53",
       "verification": "Angular typecheck, 2 tests, build, and public browser login through lesson/simulator delivery passed."
+    },
+    {
+      "taskId": "DOC1",
+      "agent": "/root/prompt_inventory",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "ownership": "read-only production prompt and documentation inventory",
+      "status": "completed-integrated",
+      "integratedCommit": "61509b1",
+      "verification": "Sol compared both runtime Vertex templates with their source, corrected public GenAI claims, formatted all documents, checked credential patterns, and kept both submission answers below 1,000 characters."
     }
   ],
   "tests": [
@@ -212,13 +222,20 @@
       "status": "passed",
       "evidence": "Formatting and lint clean; all package typechecks and builds pass; 60 tests pass across contracts, curriculum, adaptive engine, API, and web.",
       "verifiedAt": "2026-08-22T08:18:00Z"
+    },
+    {
+      "scope": "public stack and prompt documentation",
+      "command": "prettier check, git diff check, credential-pattern scan, prompt-source comparison, and submission character-count check",
+      "status": "passed",
+      "evidence": "TECH_STACK.md and PROMPTS.md published; both deployed Vertex templates recorded verbatim; recommended prompts separated; no credential pattern found; Q1 is 856 characters and Q2 is 850 characters.",
+      "verifiedAt": "2026-08-22T18:33:00Z"
     }
   ],
   "cloudResources": {
     "firebaseAuth": {
       "status": "active",
       "providers": ["google.com", "password"],
-      "authorizedHost": "suraksha.34-0-15-183.sslip.io",
+      "authorizedHost": "sutra.dmj.one",
       "evaluatorAccount": "created-and-sign-in-verified"
     },
     "firestore": {
@@ -254,6 +271,22 @@
       "host": "suraksha.34-0-15-183.sslip.io",
       "commit": "0516aa6",
       "deployedAt": "2026-08-22T08:13:00Z",
+      "status": "healthy-live-verified"
+    },
+    {
+      "kind": "tls-certificate",
+      "host": "sutra.dmj.one",
+      "issuer": "Let's Encrypt",
+      "issuedAt": "2026-08-22T11:13:00Z",
+      "expiresOn": "2026-11-20",
+      "autoRenewal": true,
+      "status": "active-serving-application"
+    },
+    {
+      "kind": "cloudflare-custom-domain-edge-release",
+      "host": "sutra.dmj.one",
+      "commit": "4c62236",
+      "deployedAt": "2026-08-22T12:35:00Z",
       "status": "healthy-live-verified"
     }
   ],

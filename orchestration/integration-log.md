@@ -93,3 +93,11 @@
 - Base and transfer scenarios, teach-back, deterministic mastery, Memory Radar, 18 persisted events, 6 metrics, reauthentication, profile isolation, and truthful forced fallback passed.
 - Real-browser login through live lesson and labelled simulator delivery passed with no browser errors.
 - Closed the reported Google authentication CSP violation by allowing inline authentication bootstrap execution only within the already restricted script policy; verified the active public response header after nginx reload.
+
+## 2026-08-22T18:33:00Z — Public stack and prompt record published
+
+- Ran an independent read-only Luna Max inventory of every production Vertex prompt, output boundary, fallback, and related public claim; confirmed that the deployed application has two runtime model prompts.
+- Added `TECH_STACK.md` with the actually deployed frontend, backend, Firebase, Firestore, Vertex AI, GCE, Docker, Nginx, Let's Encrypt, Cloudflare, GitHub, configuration, deterministic-learning, and safety boundaries.
+- Added `PROMPTS.md` with the verbatim deployed templates first, material non-secret human build prompts, and separately labelled recommended `prompt-v2` forms with untrusted-data handling, output schemas, and safety constraints.
+- Corrected the README's stale Secret Manager wording, the video guide's public URL and GenAI description, and the submission answer so it describes only the inputs the current model prompt actually receives.
+- Passed Prettier, diff, credential-pattern, prompt-source, and submission character-count checks; pushed documentation commit `61509b1`.
