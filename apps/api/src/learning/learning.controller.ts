@@ -97,7 +97,7 @@ export class LearningController {
     return this.learning.diagnostic(
       requireAuthenticatedUser(request),
       profileId,
-      omitProfileId(body),
+      normalizeDiagnosticBody(body),
       request.traceId ?? 'unavailable',
     );
   }
@@ -125,7 +125,7 @@ export class LearningController {
     return this.learning.explanation(
       requireAuthenticatedUser(request),
       profileId,
-      omitProfileId(body),
+      normalizeExplanationBody(body),
       request.traceId ?? 'unavailable',
     );
   }
@@ -153,7 +153,7 @@ export class LearningController {
     return this.learning.scenario(
       requireAuthenticatedUser(request),
       profileId,
-      omitProfileId(body),
+      normalizeScenarioBody(body),
       request.traceId ?? 'unavailable',
     );
   }
@@ -181,7 +181,7 @@ export class LearningController {
     return this.learning.teachBack(
       requireAuthenticatedUser(request),
       profileId,
-      omitProfileId(body),
+      normalizeTeachBackBody(body),
       request.traceId ?? 'unavailable',
     );
   }
@@ -226,7 +226,48 @@ function readProfileId(body: Record<string, unknown>): string {
   return value;
 }
 
-function omitProfileId(body: Record<string, unknown>): Record<string, unknown> {
-  const { profileId: _profileId, ...rest } = body;
-  return rest;
+function normalizeDiagnosticBody(body: Record<string, unknown>): Record<string, unknown> {
+  if (body['action'] === 'start') return { action: 'start' };
+  const answer = isRecord(body['answer']) ? body['answer'] : {};
+  return {
+    choiceId: body['choiceId'] ?? body['selectedChoiceId'] ?? answer['choiceId'],
+    confidence: body['confidence'],
+    responseTimeMs: body['responseTimeMs'],
+  };
+}
+
+function normalizeExplanationBody(body: Record<string, unknown>): Record<string, unknown> {
+  return {
+    forceFailure: body['forceFailure'],
+    route: body['route'],
+    scaffoldLevel: body['scaffoldLevel'],
+  };
+}
+
+function normalizeScenarioBody(body: Record<string, unknown>): Record<string, unknown> {
+  if (typeof body['choiceId'] !== 'string') {
+    return {
+      action: 'start',
+      phase: body['phase'],
+      scenarioId: body['scenarioId'],
+    };
+  }
+  return {
+    choiceId: body['choiceId'],
+    confidence: body['confidence'],
+    responseTimeMs: body['responseTimeMs'],
+    scenarioId: body['scenarioId'],
+  };
+}
+
+function normalizeTeachBackBody(body: Record<string, unknown>): Record<string, unknown> {
+  const input = isRecord(body['input']) ? body['input'] : {};
+  return {
+    text: body['text'] ?? input['text'],
+    forceFailure: body['forceFailure'],
+  };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
 }

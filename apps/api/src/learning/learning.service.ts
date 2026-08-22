@@ -158,6 +158,11 @@ export class LearningService {
     body: unknown,
     traceId: string,
   ): Promise<unknown> {
+    if (isStartRequest(body)) {
+      const { profile } = await this.requireProfile(user, profileId);
+      const delivered = this.scenarioResponse(BASE_SCENARIO_ID, profile.record.preferredLanguage);
+      return { traceId, diagnostic: delivered, scenario: delivered };
+    }
     const input = parseOrBadRequest(diagnosticRequestSchema.parse(body));
     const { bundle, profile } = await this.requireProfile(user, profileId);
     const now = new Date().toISOString();
@@ -304,13 +309,18 @@ export class LearningService {
     const input = parseOrBadRequest(explanationRequestSchema.parse(body));
     const { bundle, profile } = await this.requireProfile(user, profileId);
     const now = new Date().toISOString();
-    const recommendation =
+    const baseRecommendation =
       profile.recommendation ??
       makeRecommendation(
         profile,
         now,
         profile.events.slice(-5).map((event) => event.eventId),
       ).recommendation;
+    const recommendation = {
+      ...baseRecommendation,
+      ...(input.route ? { recommendedRoute: input.route } : {}),
+      ...(input.scaffoldLevel ? { selectedScaffoldLevel: input.scaffoldLevel } : {}),
+    };
     const forceFailure = Boolean(input.forceFailure) && this.canForceFailure(user);
     const result = await this.vertex.adaptExplanation({
       profileId,
@@ -322,8 +332,11 @@ export class LearningService {
       ],
       rubricId: 'rubric_money_direction_v1',
       language: profile.constitution.preferredLanguages[0] ?? profile.record.preferredLanguage,
-      route: recommendation.recommendedRoute,
-      scaffoldLevel: profile.scaffold?.selectedLevel ?? recommendation.selectedScaffoldLevel,
+      route: input.route ?? recommendation.recommendedRoute,
+      scaffoldLevel:
+        input.scaffoldLevel ??
+        profile.scaffold?.selectedLevel ??
+        recommendation.selectedScaffoldLevel,
       traceId,
       forceFailure,
       now,
@@ -387,6 +400,8 @@ export class LearningService {
       ],
       evidence: [...profile.evidence, result.evidenceRecord],
       recommendation,
+      selectedRoute: input.route ?? profile.selectedRoute,
+      selectedScaffoldLevel: input.scaffoldLevel ?? profile.selectedScaffoldLevel,
       updatedAt: now,
     };
     await this.repository.saveProfile(bundle.record.householdId, updated);
@@ -405,6 +420,23 @@ export class LearningService {
     body: unknown,
     traceId: string,
   ): Promise<unknown> {
+    if (isStartRequest(body)) {
+      const { profile } = await this.requireProfile(user, profileId);
+      const request = body as Record<string, unknown>;
+      const requestedId = typeof request['scenarioId'] === 'string' ? request['scenarioId'] : null;
+      const transfer = request['phase'] === 'transfer';
+      const scenarioId = transfer
+        ? (requestedId ?? profile.currentTransferScenarioId ?? BASE_SCENARIO_ID)
+        : (requestedId ?? profile.currentScenarioId);
+      const nextId = transfer ? null : profile.currentTransferScenarioId;
+      return {
+        traceId,
+        scenario: this.scenarioResponse(scenarioId, profile.record.preferredLanguage),
+        transferScenario: nextId
+          ? this.scenarioResponse(nextId, profile.record.preferredLanguage)
+          : null,
+      };
+    }
     const input = parseOrBadRequest(scenarioRequestSchema.parse(body));
     const { bundle, profile } = await this.requireProfile(user, profileId);
     const now = new Date().toISOString();
@@ -1088,6 +1120,14 @@ function mapChoice(choiceId: string): string | undefined {
 function bootstrapBody(value: unknown): unknown {
   if (value === undefined || value === null) return {};
   return value;
+}
+
+function isStartRequest(value: unknown): value is Record<string, unknown> {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    (value as Record<string, unknown>)['action'] === 'start'
+  );
 }
 
 function parseOrBadRequest<T>(value: T): T {

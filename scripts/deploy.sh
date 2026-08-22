@@ -9,6 +9,11 @@ if [[ ! -f .env ]]; then
   exit 1
 fi
 
+set -a
+# shellcheck disable=SC1091
+source .env
+set +a
+
 export APP_VERSION="$(git rev-parse --short HEAD)"
 docker_command=(docker)
 if ! docker info >/dev/null 2>&1; then

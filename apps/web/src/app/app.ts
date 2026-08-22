@@ -97,7 +97,10 @@ const normalizeProfile = (value: unknown): Profile | null => {
   if (!isRecord(value)) return null;
   const profileId = stringValue(value.profileId ?? value.id);
   const displayName = stringValue(value.displayName ?? value.name);
-  const preferredLanguage = stringValue(value.preferredLanguage ?? value.language, 'en') as Language;
+  const preferredLanguage = stringValue(
+    value.preferredLanguage ?? value.language,
+    'en',
+  ) as Language;
   if (!profileId || !displayName) return null;
   return {
     profileId,
@@ -114,9 +117,10 @@ const normalizeProfiles = (value: unknown): Profile[] => {
   const root = unwrap(value);
   if (!isRecord(root)) return [];
   const household = firstRecord(root, 'household');
-  const raw = arrayValue<unknown>(root.profiles).length > 0
-    ? arrayValue<unknown>(root.profiles)
-    : arrayValue<unknown>(household?.profiles);
+  const raw =
+    arrayValue<unknown>(root.profiles).length > 0
+      ? arrayValue<unknown>(root.profiles)
+      : arrayValue<unknown>(household?.profiles);
   return raw.map(normalizeProfile).filter((profile): profile is Profile => profile !== null);
 };
 
@@ -181,9 +185,11 @@ const normalizeState = (value: unknown): LearnerState | null => {
   if (!isRecord(value)) return null;
   const state = isRecord(value.learnerState)
     ? value.learnerState
-    : isRecord(value.knowledgeTwin)
-      ? value.knowledgeTwin
-      : value;
+    : isRecord(value.state)
+      ? value.state
+      : isRecord(value.knowledgeTwin)
+        ? value.knowledgeTwin
+        : (arrayValue<unknown>(value.states).find(isRecord) ?? null);
   if (!state || (!('status' in state) && !('mastery' in state))) return null;
   return state as LearnerState;
 };
@@ -200,7 +206,8 @@ const normalizeRecommendation = (value: unknown): Recommendation | null => {
     evidenceEventIds: arrayValue<string>(source.evidenceEventIds),
     expectedPurpose: stringValue(source.expectedPurpose ?? source.description),
     targetConceptIds: arrayValue<string>(source.targetConceptIds ?? source.conceptIds),
-    selectedScaffoldLevel: numberValue(source.selectedScaffoldLevel ?? source.scaffoldLevel) ?? undefined,
+    selectedScaffoldLevel:
+      numberValue(source.selectedScaffoldLevel ?? source.scaffoldLevel) ?? undefined,
     alternatives: arrayValue<string>(source.alternatives),
     generatedAt: stringValue(source.generatedAt),
   };
@@ -227,19 +234,24 @@ const normalizeEvidence = (value: unknown): Evidence | null => {
     sourceRubricId: stringValue(source.sourceRubricId),
     promptTemplateVersion: stringValue(source.promptTemplateVersion),
     fallbackReason: typeof source.fallbackReason === 'string' ? source.fallbackReason : null,
-    modelCallAttempted: typeof source.modelCallAttempted === 'boolean' ? source.modelCallAttempted : undefined,
-    modelCallSucceeded: typeof source.modelCallSucceeded === 'boolean' ? source.modelCallSucceeded : undefined,
+    modelCallAttempted:
+      typeof source.modelCallAttempted === 'boolean' ? source.modelCallAttempted : undefined,
+    modelCallSucceeded:
+      typeof source.modelCallSucceeded === 'boolean' ? source.modelCallSucceeded : undefined,
     stateBefore: source.stateBefore,
     stateAfter: source.stateAfter,
     deterministicReason: stringValue(source.deterministicReason ?? source.reason),
     reason: stringValue(source.reason),
   };
-  return Object.values(evidence).some((item) => item !== undefined && item !== '') ? evidence : null;
+  return Object.values(evidence).some((item) => item !== undefined && item !== '')
+    ? evidence
+    : null;
 };
 
 const normalizeScenario = (value: unknown): Scenario | null => {
   const source = firstRecord(value, 'scenario', 'trainingScenario');
   if (!source || (!source.prompt && !source.title)) return null;
+  const contract = isRecord(source.scenario) ? source.scenario : {};
   const choices = arrayValue<unknown>(source.choices)
     .filter(isRecord)
     .map((choice) => ({
@@ -252,16 +264,20 @@ const normalizeScenario = (value: unknown): Scenario | null => {
     }))
     .filter((choice) => choice.id && choice.text);
   return {
-    scenarioId: stringValue(source.scenarioId ?? source.id),
+    scenarioId: stringValue(source.scenarioId ?? source.id ?? contract.scenarioId),
     trainingLabel: stringValue(source.trainingLabel ?? source.label, 'TRAINING SIMULATION'),
     title: stringValue(source.title),
-    context: stringValue(source.context),
-    channel: stringValue(source.channel),
-    manipulationPatterns: arrayValue<string>(source.manipulationPatterns),
-    unsafeRequestCategory: stringValue(source.unsafeRequestCategory),
+    context: stringValue(source.context ?? contract.context),
+    channel: stringValue(source.channel ?? contract.channel),
+    manipulationPatterns: arrayValue<string>(
+      source.manipulationPatterns ?? contract.manipulationPatterns,
+    ),
+    unsafeRequestCategory: stringValue(
+      source.unsafeRequestCategory ?? contract.unsafeRequestCategory,
+    ),
     prompt: stringValue(source.prompt),
     choices,
-    safestChoiceId: stringValue(source.safestChoiceId),
+    safestChoiceId: stringValue(source.safestChoiceId ?? contract.safestChoiceId),
   };
 };
 
@@ -299,7 +315,10 @@ const normalizeDiagnostic = (value: unknown, profileId: string): DiagnosticView 
     diagnosticId: stringValue(source.diagnosticId ?? source.id, `diagnostic-${profileId}`),
     assessmentId: stringValue(source.assessmentId, `assessment-${profileId}`),
     activityId: stringValue(source.activityId, `diagnostic-${profileId}`),
-    conceptId: stringValue(source.conceptId ?? arrayValue<string>(source.conceptIds)[0], 'money_in_vs_money_out'),
+    conceptId: stringValue(
+      source.conceptId ?? arrayValue<string>(source.conceptIds)[0],
+      'money_in_vs_money_out',
+    ),
     context: stringValue(source.context, 'upi'),
     prompt,
     choices,
@@ -307,7 +326,8 @@ const normalizeDiagnostic = (value: unknown, profileId: string): DiagnosticView 
 };
 
 const normalizeDashboard = (value: unknown): Dashboard | null => {
-  const source = firstRecord(value, 'dashboard', 'analytics', 'knowledgeDashboard') ?? firstRecord(value);
+  const source =
+    firstRecord(value, 'dashboard', 'analytics', 'knowledgeDashboard') ?? firstRecord(value);
   return source as Dashboard | null;
 };
 
@@ -358,7 +378,10 @@ export class App implements OnInit {
   readonly languageOptions = languages;
   readonly contextOptions = contexts;
 
-  constructor(readonly auth: AuthService, private readonly api: ApiService) {}
+  constructor(
+    readonly auth: AuthService,
+    private readonly api: ApiService,
+  ) {}
 
   ngOnInit(): void {
     void this.prepareApplication();
@@ -409,7 +432,9 @@ export class App implements OnInit {
       const profiles = normalizeProfiles(payload);
       this.profiles.set(profiles);
       const household = firstRecord(payload, 'household');
-      this.householdName.set(stringValue(payload.householdName ?? household?.displayName, 'Your household'));
+      this.householdName.set(
+        stringValue(payload.householdName ?? household?.displayName, 'Your household'),
+      );
       this.stage.set('profiles');
       const selectedId = stringValue(payload.selectedProfileId ?? payload.activeProfileId);
       if (selectedId && profiles.some((profile) => profile.profileId === selectedId)) {
@@ -461,7 +486,10 @@ export class App implements OnInit {
   patchAccessibility(key: keyof Constitution['accessibility'], value: unknown): void {
     const current = this.constitutionDraft();
     if (!current) return;
-    this.constitutionDraft.set({ ...current, accessibility: { ...current.accessibility, [key]: value } } as DraftConstitution);
+    this.constitutionDraft.set({
+      ...current,
+      accessibility: { ...current.accessibility, [key]: value },
+    } as DraftConstitution);
   }
 
   toggleLanguage(language: Language): void {
@@ -486,8 +514,13 @@ export class App implements OnInit {
     const profile = this.selectedProfile();
     const draft = this.constitutionDraft();
     if (!profile || !draft) return;
-    if (!draft.allowCrossSessionPersonalization && Object.values(draft.personalizationSignals).some(Boolean)) {
-      this.error.set('Turn off the individual signals before disabling cross-session personalisation.');
+    if (
+      !draft.allowCrossSessionPersonalization &&
+      Object.values(draft.personalizationSignals).some(Boolean)
+    ) {
+      this.error.set(
+        'Turn off the individual signals before disabling cross-session personalisation.',
+      );
       return;
     }
     await this.runTask('constitution', async () => {
@@ -528,8 +561,13 @@ export class App implements OnInit {
     const conceptId = this.conceptId();
     if (!profile || !conceptId) return;
     await this.runTask('reset', async () => {
-      await this.api.request('/evaluator/reset', { method: 'POST', body: { profileId: profile.profileId, conceptId } });
-      this.notice.set('This concept was reset. The next diagnostic will start from an unknown state.');
+      await this.api.request('/evaluator/reset', {
+        method: 'POST',
+        body: { profileId: profile.profileId, conceptId },
+      });
+      this.notice.set(
+        'This concept was reset. The next diagnostic will start from an unknown state.',
+      );
       await this.selectProfile(profile.profileId);
     });
   }
@@ -574,13 +612,17 @@ export class App implements OnInit {
       this.captureEvidence(payload);
       this.selectedRoute.set(this.recommendation()?.recommendedRoute ?? 'deep');
       this.selectedScaffold.set(this.recommendation()?.selectedScaffoldLevel ?? 2);
-      this.notice.set('Diagnostic recorded. The recommendation is based on this learner’s evidence.');
+      this.notice.set(
+        'Diagnostic recorded. The recommendation is based on this learner’s evidence.',
+      );
     });
   }
 
   chooseRoute(route: RouteKind): void {
     this.selectedRoute.set(route);
-    this.notice.set(`You chose the ${this.routeLabel(route)}. This override is sent with the lesson request.`);
+    this.notice.set(
+      `You chose the ${this.routeLabel(route)}. This override is sent with the lesson request.`,
+    );
   }
 
   chooseScaffold(level: number): void {
@@ -614,7 +656,9 @@ export class App implements OnInit {
       const payload = (unwrap(raw) ?? {}) as ApiResponse;
       this.lesson.set(normalizeLesson(payload));
       this.captureEvidence(payload);
-      this.notice.set('The approved explanation is ready. Next, test the same invariant in a safe simulation.');
+      this.notice.set(
+        'The approved explanation is ready. Next, test the same invariant in a safe simulation.',
+      );
       await this.loadScenario('practice');
     });
   }
@@ -635,8 +679,10 @@ export class App implements OnInit {
     if (phase === 'transfer') this.transferScenario.set(scenario);
     else {
       this.scenario.set(scenario);
-      const transferSource = firstRecord(payload, 'transferScenario');
-      this.transferScenario.set(transferSource ? normalizeScenario({ transferScenario: transferSource }) : null);
+      const transferSource = firstRecord(payload, 'transferScenario', 'nextScenario');
+      this.transferScenario.set(
+        transferSource ? normalizeScenario({ transferScenario: transferSource }) : null,
+      );
     }
     this.scenarioPhase.set(phase);
     this.scenarioChoice.set('');
@@ -705,13 +751,15 @@ export class App implements OnInit {
         idempotencyKey: randomId('teachback'),
       });
       const payload = (unwrap(raw) ?? {}) as ApiResponse;
-      const analysis = firstRecord(payload, 'analysis', 'teachBack', 'teachBackOutput');
+      const analysis = firstRecord(payload, 'analysis', 'teachBack', 'teachBackOutput', 'output');
       this.teachBackAnalysis.set((analysis ?? payload) as TeachBackAnalysis);
       this.learnerState.set(normalizeState(payload) ?? this.learnerState());
       this.dashboard.set(normalizeDashboard(payload.dashboard ?? payload) ?? this.dashboard());
       this.captureEvidence(payload);
       await this.refreshDashboard();
-      this.notice.set('Teach-back analysed. The Knowledge Twin and Memory Radar now reflect this evidence.');
+      this.notice.set(
+        'Teach-back analysed. The Knowledge Twin and Memory Radar now reflect this evidence.',
+      );
     });
   }
 
@@ -726,7 +774,9 @@ export class App implements OnInit {
       this.recommendation.set(normalizeRecommendation(payload) ?? this.recommendation());
       this.captureEvidence(payload);
     } catch {
-      this.notice.set('The dashboard refresh is unavailable; the last persisted view remains visible.');
+      this.notice.set(
+        'The dashboard refresh is unavailable; the last persisted view remains visible.',
+      );
     }
   }
 
@@ -796,7 +846,9 @@ export class App implements OnInit {
     const parsed = new Date(value);
     return Number.isNaN(parsed.getTime())
       ? value
-      : new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'short' }).format(parsed);
+      : new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'short' }).format(
+          parsed,
+        );
   }
 
   routeLabel(route: RouteKind | null | undefined): string {
@@ -806,7 +858,10 @@ export class App implements OnInit {
   }
 
   languageLabel(language: string): string {
-    return { hi: 'हिंदी', en: 'English', hinglish: 'Hinglish', hi_en: 'हिंदी + English' }[language] ?? language;
+    return (
+      { hi: 'हिंदी', en: 'English', hinglish: 'Hinglish', hi_en: 'हिंदी + English' }[language] ??
+      language
+    );
   }
 
   contextLabel(context: string): string {
@@ -814,13 +869,15 @@ export class App implements OnInit {
   }
 
   levelLabel(level: number | null | undefined): string {
-    return {
-      1: 'Observe a complete example',
-      2: 'Explain why each step exists',
-      3: 'Complete selected missing steps',
-      4: 'Solve with optional hints',
-      5: 'Transfer to a new context',
-    }[level ?? 0] ?? 'Support level not selected';
+    return (
+      {
+        1: 'Observe a complete example',
+        2: 'Explain why each step exists',
+        3: 'Complete selected missing steps',
+        4: 'Solve with optional hints',
+        5: 'Transfer to a new context',
+      }[level ?? 0] ?? 'Support level not selected'
+    );
   }
 
   reviewItems(): ReviewItem[] {
@@ -828,12 +885,21 @@ export class App implements OnInit {
   }
 
   recallEstimate(): Record<string, unknown> | null {
-    const estimate = this.dashboard()?.recallEstimate ?? this.dashboard()?.memoryRadar;
-    return isRecord(estimate) ? estimate : null;
+    const estimate: unknown = this.dashboard()?.recallEstimate ?? this.dashboard()?.memoryRadar;
+    if (!isRecord(estimate)) return null;
+    return isRecord(estimate.estimate) ? estimate.estimate : estimate;
   }
 
   analyticsEntries(): Array<[string, string | number | null]> {
     const values = this.dashboard()?.householdAnalytics ?? this.dashboard()?.analytics;
+    if (Array.isArray(values)) {
+      return values
+        .filter(isRecord)
+        .map((metric) => [
+          stringValue(metric.name ?? metric.metricId, 'metric'),
+          typeof metric.value === 'number' ? metric.value : null,
+        ]);
+    }
     if (!isRecord(values)) return [];
     return Object.entries(values).filter(
       (entry): entry is [string, string | number | null] =>
@@ -895,7 +961,10 @@ export class App implements OnInit {
   }
 
   private async runTask(label: string, task: () => Promise<void>): Promise<void> {
-    if (this.busy()) return;
+    if (this.busy()) {
+      await task();
+      return;
+    }
     this.busy.set(label);
     this.error.set('');
     try {

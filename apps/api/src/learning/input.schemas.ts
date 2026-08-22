@@ -16,7 +16,13 @@ export const scenarioRequestSchema = diagnosticRequestSchema.extend({
   scenarioId: z.string().trim().min(1).max(128).optional(),
 });
 
-export const explanationRequestSchema = z.object({ forceFailure: z.boolean().optional() }).strict();
+export const explanationRequestSchema = z
+  .object({
+    forceFailure: z.boolean().optional(),
+    route: z.enum(['quick', 'deep', 'low_energy']).optional(),
+    scaffoldLevel: z.number().int().min(1).max(5).optional(),
+  })
+  .strict();
 
 export const teachBackRequestSchema = z
   .object({
