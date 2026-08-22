@@ -2,23 +2,271 @@
 
 <header class="app-header" aria-labelledby="application-title">
   <div class="app-header__inner">
-    <a class="brand" routerLink="/" aria-label="SurakshaSutra home">
+    <a class="brand" href="#main-content" aria-label="SurakshaSutra home">
       <span class="brand__mark" aria-hidden="true">स</span>
-      <span>
+      <span class="brand__copy">
         <span class="brand__title" id="application-title">SurakshaSutra</span>
-        <span class="brand__subtitle">Learner-owned digital safety</span>
+        <span class="brand__subtitle">अपनी समझ, अपनी सुरक्षा · Learner-owned digital safety</span>
       </span>
     </a>
+    @if (auth.user(); as user) {
+      <div class="header-actions">
+        <span class="signed-in" title="Signed-in account">{{ user.email || 'Google account' }}</span>
+        <button class="button button--quiet button--small" type="button" (click)="signOut()" [disabled]="busy() !== null">
+          Sign out
+        </button>
+      </div>
+    }
   </div>
 </header>
 
 <main id="main-content" class="app-main" tabindex="-1">
-  <router-outlet />
+  <section class="hero-strip" aria-labelledby="hero-title">
+    <div>
+      <p class="eyebrow">Digital safety · भारत के घरों के लिए</p>
+      <h1 id="hero-title">A safer next step, shaped around what you know.</h1>
+      <p class="hero-copy">
+        SurakshaSutra observes, explains, checks, and schedules review — while you stay in control of every signal.
+      </p>
+    </div>
+    <div class="hero-stamp" aria-label="Privacy promise">
+      <span class="hero-stamp__seal" aria-hidden="true">✓</span>
+      <span><strong>Safe by design</strong><br />No passwords, OTPs, PINs, or active links.</span>
+    </div>
+  </section>
+
+  @if (error()) {
+    <div class="alert alert--error" role="alert">
+      <strong>Something needs attention.</strong>
+      <span>{{ error() }}</span>
+    </div>
+  }
+  @if (notice()) {
+    <div class="alert alert--notice" role="status" aria-live="polite">{{ notice() }}</div>
+  }
+  <div class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+    {{ busy() ? 'Working on ' + busy() + '…' : '' }}
+  </div>
+
+  @if (stage() === 'login') {
+    <section class="login-layout" aria-labelledby="login-title">
+      <article class="card login-card">
+        <div class="section-kicker">01 · Sign in</div>
+        <h2 id="login-title">Enter your learning space</h2>
+        <p class="muted">
+          Use Google one-click or the evaluator account supplied with this deployment. Your household and learner profiles stay behind your sign-in.
+        </p>
+        <button class="button button--google" type="button" (click)="signInWithGoogle()" [disabled]="busy() !== null">
+          <span class="google-g" aria-hidden="true">G</span>
+          <span>{{ busy() === 'login' ? 'Connecting…' : 'Continue with Google' }}</span>
+        </button>
+        <div class="or-divider"><span>or evaluator sign-in</span></div>
+        <form class="stack" (ngSubmit)="signInWithPassword()" aria-label="Evaluator email and password sign-in">
+          <label class="field">
+            <span>Email</span>
+            <input type="email" autocomplete="username" name="email" [(ngModel)]="email" placeholder="evaluator@example.com" required />
+          </label>
+          <label class="field">
+            <span>Password</span>
+            <input type="password" autocomplete="current-password" name="password" [(ngModel)]="password" placeholder="Enter the supplied password" required />
+          </label>
+          <button class="button button--primary" type="submit" [disabled]="busy() !== null">
+            {{ busy() === 'login' ? 'Signing in…' : 'Sign in to evaluator space' }}
+          </button>
+        </form>
+        <p class="fine-print">This is a training environment. Never enter a real password, OTP, PIN, or payment detail.</p>
+      </article>
+      <aside class="login-aside" aria-label="How the learning loop works">
+        <p class="section-kicker">One connected loop</p>
+        <div class="loop-list">
+          <div><span>1</span><strong>Observe</strong><small>Diagnostic + confidence capture</small></div>
+          <div><span>2</span><strong>Adapt</strong><small>Route, scaffold, and explanation</small></div>
+          <div><span>3</span><strong>Verify</strong><small>Scenario, transfer, and teach-back</small></div>
+          <div><span>4</span><strong>Revisit</strong><small>Memory Radar from persisted history</small></div>
+        </div>
+        <p class="aside-note">Every recommendation shows the evidence used. You can choose a different route or turn off a signal.</p>
+      </aside>
+    </section>
+  } @else {
+    <section class="household-bar" aria-labelledby="household-title">
+      <div>
+        <p class="section-kicker">Your household</p>
+        <h2 id="household-title">{{ householdName() || 'Household profiles' }}</h2>
+        <p class="muted">Switch profiles to see an isolated constitution, knowledge twin, and review plan.</p>
+      </div>
+      <div class="household-meta">
+        <span class="seed-badge">Evaluator test account</span>
+        @if (busy()) { <span class="loading-dot" role="status">Saving…</span> }
+      </div>
+    </section>
+
+    <nav class="profile-nav" aria-label="Learner profiles">
+      @for (profile of profiles(); track profile.profileId) {
+        <button
+          class="profile-pill"
+          [class.profile-pill--selected]="selectedProfile()?.profileId === profile.profileId"
+          type="button"
+          [attr.aria-current]="selectedProfile()?.profileId === profile.profileId ? 'page' : null"
+          (click)="selectProfile(profile.profileId)"
+        >
+          <span class="profile-avatar" aria-hidden="true">{{ profile.displayName.slice(0, 1) }}</span>
+          <span><strong>{{ profile.displayName }}</strong><small>{{ languageLabel(profile.preferredLanguage) }}</small></span>
+        </button>
+      } @empty {
+        <p class="empty-inline">No learner profiles were returned for this household.</p>
+      }
+    </nav>
+
+    @if (stage() === 'profiles') {
+      <section class="card profile-picker" aria-labelledby="picker-title">
+        <p class="section-kicker">Choose a learner</p>
+        <h2 id="picker-title">Three perspectives. Three private learning states.</h2>
+        <p class="muted">Select a profile to load its persisted evidence. Nothing from another learner is copied across.</p>
+        <div class="profile-grid">
+          @for (profile of profiles(); track profile.profileId) {
+            <button class="profile-card" type="button" (click)="selectProfile(profile.profileId)">
+              <span class="profile-avatar profile-avatar--large" aria-hidden="true">{{ profile.displayName.slice(0, 1) }}</span>
+              <span class="profile-card__text"><strong>{{ profile.displayName }}</strong><small>{{ languageLabel(profile.preferredLanguage) }} · {{ profile.ageBand }}</small></span>
+              <span class="profile-card__arrow" aria-hidden="true">→</span>
+            </button>
+          } @empty {
+            <div class="empty-state"><strong>No profiles yet</strong><span>The service returned an empty household. Sign out and try the supplied evaluator account.</span></div>
+          }
+        </div>
+      </section>
+    } @else if (selectedProfile(); as profile) {
+      <div class="journey-heading">
+        <div>
+          <p class="section-kicker">Learning workspace · {{ profile.displayName }}</p>
+          <h2>{{ profile.displayName }}’s next safe step</h2>
+          <p class="muted">{{ languageLabel(profile.preferredLanguage) }} · {{ profile.ageBand }} · {{ profile.interfaceMode || 'learner-controlled' }}</p>
+        </div>
+        <button class="button button--quiet" type="button" (click)="stage.set('profiles')">Switch profile</button>
+      </div>
+
+      <div class="journey-grid">
+        <section class="card constitution-card" aria-labelledby="constitution-title">
+          <div class="card-heading">
+            <div><p class="section-kicker">Learner control</p><h2 id="constitution-title">Personal Learning Constitution</h2></div>
+            <span class="status-tag">Private to {{ profile.displayName }}</span>
+          </div>
+          <p class="muted">Choose what the system may use, how it should explain, and how much support you want.</p>
+          @if (constitutionDraft(); as draft) {
+            <div class="constitution-form">
+              <label class="field field--wide"><span>Learning goal</span><input [ngModel]="draft.goal" (ngModelChange)="patchConstitution('goal', $event)" name="goal" /></label>
+              <div class="field-row">
+                <label class="field"><span>Preferred language</span><select [ngModel]="draft.preferredLanguages[0]" (ngModelChange)="patchConstitution('preferredLanguages', [$event])" name="language"><option value="hi">हिंदी</option><option value="en">English</option><option value="hinglish">Hinglish</option><option value="hi_en">हिंदी + English</option></select></label>
+                <label class="field"><span>Session minutes</span><select [ngModel]="draft.sessionMinutes" (ngModelChange)="patchConstitution('sessionMinutes', +$event)" name="minutes"><option [value]="3">3 minutes</option><option [value]="5">5 minutes</option><option [value]="7">7 minutes</option><option [value]="10">10 minutes</option><option [value]="15">15 minutes</option></select></label>
+              </div>
+              <div class="field-row">
+                <label class="field"><span>Reading complexity</span><select [ngModel]="draft.readingComplexity" (ngModelChange)="patchConstitution('readingComplexity', $event)" name="complexity"><option value="simple">Simple</option><option value="standard">Standard</option><option value="advanced">Advanced</option></select></label>
+                <label class="field"><span>Explanation depth</span><select [ngModel]="draft.explanationDepth" (ngModelChange)="patchConstitution('explanationDepth', $event)" name="depth"><option value="brief">Brief</option><option value="conceptual">Conceptual</option><option value="deep">Deep</option></select></label>
+              </div>
+              <label class="field"><span>Challenge preference</span><select [ngModel]="draft.challengePreference" (ngModelChange)="patchConstitution('challengePreference', $event)" name="challenge"><option value="gentle">Gentle</option><option value="moderate">Moderate</option><option value="high">High</option></select></label>
+              <fieldset class="choice-fieldset"><legend>Relevant digital contexts</legend><div class="check-grid">@for (context of contextOptions; track context) {<label class="check-item"><input type="checkbox" [checked]="draft.relevantContexts.includes(context)" (change)="toggleContext(context)" /><span>{{ contextLabel(context) }}</span></label>}</div></fieldset>
+              <fieldset class="choice-fieldset"><legend>Personalisation signals <span class="legend-note">{{ draft.allowCrossSessionPersonalization ? 'You can disable each one' : 'Cross-session signals are off' }}</span></legend><div class="check-grid check-grid--signals"><label class="check-item"><input type="checkbox" [checked]="draft.personalizationSignals.correctness" (change)="patchSignal('correctness', $any($event.target).checked)" [disabled]="!draft.allowCrossSessionPersonalization" /><span>Correctness</span></label><label class="check-item"><input type="checkbox" [checked]="draft.personalizationSignals.confidence" (change)="patchSignal('confidence', $any($event.target).checked)" [disabled]="!draft.allowCrossSessionPersonalization" /><span>Confidence</span></label><label class="check-item"><input type="checkbox" [checked]="draft.personalizationSignals.responseTime" (change)="patchSignal('responseTime', $any($event.target).checked)" [disabled]="!draft.allowCrossSessionPersonalization" /><span>Response time</span></label><label class="check-item"><input type="checkbox" [checked]="draft.personalizationSignals.hintUse" (change)="patchSignal('hintUse', $any($event.target).checked)" [disabled]="!draft.allowCrossSessionPersonalization" /><span>Hint use</span></label><label class="check-item"><input type="checkbox" [checked]="draft.personalizationSignals.teachBack" (change)="patchSignal('teachBack', $any($event.target).checked)" [disabled]="!draft.allowCrossSessionPersonalization" /><span>Teach-back</span></label><label class="check-item"><input type="checkbox" [checked]="draft.personalizationSignals.transfer" (change)="patchSignal('transfer', $any($event.target).checked)" [disabled]="!draft.allowCrossSessionPersonalization" /><span>Transfer</span></label></div></fieldset>
+              <fieldset class="choice-fieldset"><legend>Accessibility</legend><div class="check-grid"><label class="check-item"><input type="checkbox" [checked]="draft.accessibility.reducedMotion" (change)="patchAccessibility('reducedMotion', $any($event.target).checked)" /><span>Reduced motion</span></label><label class="check-item"><input type="checkbox" [checked]="draft.accessibility.highContrast" (change)="patchAccessibility('highContrast', $any($event.target).checked)" /><span>High contrast</span></label><label class="check-item"><input type="checkbox" [checked]="draft.accessibility.keyboardOnly" (change)="patchAccessibility('keyboardOnly', $any($event.target).checked)" /><span>Keyboard only</span></label><label class="check-item"><input type="checkbox" [checked]="draft.accessibility.screenReaderOptimized" (change)="patchAccessibility('screenReaderOptimized', $any($event.target).checked)" /><span>Screen-reader optimised</span></label></div></fieldset>
+              <fieldset class="consent-list"><legend>Consent controls</legend><label class="toggle-item"><input type="checkbox" [checked]="draft.allowCrossSessionPersonalization" (change)="patchConstitution('allowCrossSessionPersonalization', $any($event.target).checked)" /><span><strong>Use my evidence across sessions</strong><small>Turn this off to stop personalisation signals.</small></span></label><label class="toggle-item"><input type="checkbox" [checked]="draft.allowVoiceProcessing" (change)="patchConstitution('allowVoiceProcessing', $any($event.target).checked)" /><span><strong>Allow voice processing</strong><small>Voice interaction is hidden in this P0 demo.</small></span></label><label class="toggle-item"><input type="checkbox" [checked]="draft.allowReminderNotifications" (change)="patchConstitution('allowReminderNotifications', $any($event.target).checked)" /><span><strong>Allow review reminders</strong><small>Only a consent setting; no message is sent from this screen.</small></span></label></fieldset>
+              <div class="button-row"><button class="button button--primary" type="button" (click)="saveConstitution()">Save constitution</button><button class="button button--quiet" type="button" (click)="exportProfile()">Export my profile</button></div>
+              @if (profileExported()) { <span class="success-note" role="status">Export prepared without secrets.</span> }
+            </div>
+          } @else {
+            <div class="empty-state"><strong>Constitution unavailable</strong><span>The service has not returned this learner’s policy yet. No settings are invented here.</span></div>
+          }
+        </section>
+
+        <div class="journey-main">
+          <section class="card diagnostic-card" aria-labelledby="diagnostic-title">
+            <div class="card-heading"><div><p class="section-kicker">Observe</p><h2 id="diagnostic-title">Adaptive diagnostic</h2></div><span class="step-badge">1 / 6</span></div>
+            @if (diagnostic(); as diagnostic) {
+              <p class="question">{{ diagnostic.prompt }}</p>
+              <fieldset class="answer-list"><legend class="visually-hidden">Choose an answer</legend>@for (choice of diagnostic.choices; track choice.id) {<label class="answer-option" [class.answer-option--selected]="selectedDiagnosticChoice() === choice.id"><input type="radio" name="diagnostic-choice" [value]="choice.id" [checked]="selectedDiagnosticChoice() === choice.id" (change)="setDiagnosticChoice(choice.id)" /><span>{{ choice.text }}</span></label>}</fieldset>
+              <div class="confidence-block"><div class="confidence-heading"><span>How confident are you?</span><strong>{{ confidencePercent() }}</strong></div><input class="confidence-range" type="range" min="0" max="100" step="5" [value]="confidence() * 100" (input)="setConfidence($event)" aria-label="Confidence from zero to one hundred percent" /><div class="range-labels"><span>Not sure</span><span>Very sure</span></div></div>
+              <button class="button button--primary" type="button" (click)="submitDiagnostic()" [disabled]="busy() !== null || !selectedDiagnosticChoice()">Record diagnostic evidence</button>
+            } @else {
+              <div class="empty-state"><strong>Diagnostic content is not available yet.</strong><span>It will appear when the authenticated learning service returns a fresh question. No result is assumed.</span></div>
+            }
+          </section>
+
+          @if (recommendation(); as recommendation) {
+            <section class="card route-card" aria-labelledby="route-title">
+              <div class="card-heading"><div><p class="section-kicker">Estimate → select</p><h2 id="route-title">Your next route</h2></div><span class="route-chip">{{ routeLabel(recommendation.recommendedRoute) }}</span></div>
+              <p class="route-reason"><strong>Why this route?</strong> {{ recommendation.reason || 'The service returned no explanation for this recommendation.' }}</p>
+              @if (recommendation.evidenceEventIds?.length) {<p class="evidence-line">Evidence used: {{ recommendation.evidenceEventIds?.join(', ') }}</p>}
+              <div class="route-grid"><button type="button" class="route-option" [class.route-option--selected]="selectedRoute() === 'quick'" (click)="chooseRoute('quick')"><strong>Quick Route</strong><span>Short targeted practice</span></button><button type="button" class="route-option" [class.route-option--selected]="selectedRoute() === 'deep'" (click)="chooseRoute('deep')"><strong>Deep Route</strong><span>Explanation, worked example, transfer</span></button><button type="button" class="route-option" [class.route-option--selected]="selectedRoute() === 'low_energy'" (click)="chooseRoute('low_energy')"><strong>Low-Energy Route</strong><span>One example and two short questions</span></button></div>
+              <fieldset class="scaffold-fieldset"><legend>Support level <span class="legend-note">Recommended {{ recommendation.selectedScaffoldLevel || '—' }} · {{ levelLabel(recommendation.selectedScaffoldLevel) }}</span></legend><div class="scaffold-grid">@for (level of [1,2,3,4,5]; track level) {<button type="button" class="scaffold-option" [class.scaffold-option--selected]="selectedScaffold() === level" (click)="chooseScaffold(level)" [attr.aria-label]="'Support level ' + level + ': ' + levelLabel(level)"><span>{{ level }}</span><small>{{ levelLabel(level) }}</small></button>}</div></fieldset>
+              <div class="route-actions"><button class="button button--primary" type="button" (click)="startLesson()" [disabled]="busy() !== null">Continue with {{ routeLabel(selectedRoute() || recommendation.recommendedRoute) }}</button><button class="button button--quiet" type="button" (click)="openEvidence()">Why am I seeing this?</button></div>
+            </section>
+          } @else {
+            <section class="card empty-route" aria-labelledby="route-wait-title"><p class="section-kicker">Estimate → select</p><h2 id="route-wait-title">Your route will appear after the diagnostic</h2><p class="muted">The recommendation is computed from this learner’s recorded answer and confidence, not from a profile label.</p></section>
+          }
+
+          @if (lesson(); as lesson) {
+            <section class="card lesson-card" aria-labelledby="lesson-title">
+              <div class="card-heading"><div><p class="section-kicker">Teach</p><h2 id="lesson-title">{{ lesson.title || 'A safer payment direction' }}</h2></div><span class="generation-badge" [class.generation-badge--fallback]="lesson.generationMode === 'curated_fallback' || evidence()?.generationMode === 'curated_fallback'"><span aria-hidden="true">●</span>{{ lesson.generationMode === 'curated_fallback' || evidence()?.generationMode === 'curated_fallback' ? 'CURATED FALLBACK' : 'LIVE MODEL' }}</span></div>
+              <p class="lesson-objective">{{ lesson.objective || 'Distinguish receiving money from authorising an outgoing action.' }}</p>
+              @if (lesson.explanation) {<p class="lesson-explanation">{{ lesson.explanation }}</p>} @else {<div class="empty-state"><strong>No explanation was returned.</strong><span>Nothing is substituted for a missing model response.</span></div>}
+              @if (lesson.workedExample) {<div class="worked-example"><span class="mini-label">Worked example</span><p>{{ lesson.workedExample }}</p></div>}
+              @if (lesson.generationMode === 'curated_fallback' || evidence()?.generationMode === 'curated_fallback') {<p class="fallback-copy">Curated fallback used because the live model was unavailable or its output was rejected.</p>}
+              <div class="lesson-footer"><button class="button button--quiet" type="button" (click)="openEvidence()">Open live evidence</button><button class="text-button" type="button" (click)="toggleFallback()">{{ forceFallback() ? 'Use live model next' : 'Test fallback path' }}</button></div>
+            </section>
+          }
+
+          @if (activeScenario(); as scenario) {
+            <section class="card scenario-card" aria-labelledby="scenario-title">
+              <div class="card-heading"><div><p class="section-kicker">Assess · {{ scenarioPhase() === 'transfer' ? 'new context' : 'familiar context' }}</p><h2 id="scenario-title">{{ scenarioPhase() === 'transfer' ? 'Now use the same idea in a new setting' : 'Practise a fictional situation' }}</h2></div><span class="training-badge">TRAINING SIMULATION</span></div>
+              <p class="scenario-title">{{ scenario.title }}</p>
+              <p class="scenario-prompt">{{ scenario.prompt }}</p>
+              <div class="scenario-meta"><span>{{ scenario.channel || 'fictional message' }}</span>@if (scenario.context) {<span>{{ contextLabel(scenario.context) }}</span>}@for (pattern of scenario.manipulationPatterns || []; track pattern) {<span>{{ pattern }}</span>}</div>
+              <fieldset class="answer-list"><legend class="visually-hidden">Choose the safest response</legend>@for (choice of scenario.choices || []; track choice.id) {<label class="answer-option" [class.answer-option--selected]="scenarioChoice() === choice.id"><input type="radio" name="scenario-choice" [value]="choice.id" [checked]="scenarioChoice() === choice.id" (change)="setScenarioChoice(choice.id)" /><span>{{ choice.text }}</span></label>}</fieldset>
+              <p class="safety-note"><strong>Safety boundary:</strong> This is fictional training. No active links, real phone numbers, credentials, institutions, or operational scam content.</p>
+              @if (scenarioResult(); as result) {<div class="result-callout" [class.result-callout--positive]="result.correct === true" [class.result-callout--caution]="result.correct === false"><strong>{{ result.correct === true ? 'Verified understanding' : result.correct === false ? 'A misconception needs one more look' : 'Response recorded' }}</strong>@if (result.feedback) {<span>{{ result.feedback }}</span>}</div>}
+              <button class="button button--primary" type="button" (click)="submitScenario()" [disabled]="busy() !== null || !scenarioChoice()">{{ scenarioPhase() === 'transfer' ? 'Record transfer answer' : 'Record scenario answer' }}</button>
+            </section>
+          } @else if (lesson()) {
+            <section class="card empty-state-card"><strong>Scenario is not available yet.</strong><span>The service did not return a safe, schema-validated fictional scenario.</span></section>
+          }
+
+          @if (scenarioPhase() === 'transfer' || scenarioResult()) {
+            <section class="card teachback-card" aria-labelledby="teachback-title">
+              <div class="card-heading"><div><p class="section-kicker">Explain</p><h2 id="teachback-title">Teach-back misconception debugger</h2></div><span class="step-badge">5 / 6</span></div>
+              <p class="muted">{{ profile.preferredLanguage === 'hi' ? 'अपनी भाषा में समझाएँ — सही कड़ी, छूटी कड़ी और भ्रम को अलग किया जाएगा।' : 'Explain it in your own words. The service will separate correct, partial, missing, and unsafe claims.' }}</p>
+              <label class="field"><span>What will you do if a request says you must authorise a payment to receive money?</span><textarea rows="5" maxlength="2000" [ngModel]="teachBackText()" (ngModelChange)="setTeachBack($event)" name="teachback" placeholder="Write two or three sentences…"></textarea></label>
+              <div class="button-row"><button class="button button--primary" type="button" (click)="submitTeachBack()" [disabled]="busy() !== null || !teachBackText().trim()">Analyse my explanation</button><span class="privacy-note">Text is analysed for claims; raw teach-back is not retained.</span></div>
+              @if (teachBackAnalysis(); as analysis) {
+                <div class="analysis-grid" aria-live="polite"><div class="analysis-column"><span class="mini-label mini-label--green">Correct claims</span>@for (claim of analysis.correctClaims || []; track claim.claim) {<p>{{ claim.claim }}</p>}@if (!analysis.correctClaims?.length) {<p class="muted">No correct claim returned.</p>}</div><div class="analysis-column"><span class="mini-label mini-label--amber">Partial / missing</span>@for (claim of analysis.partialClaims || []; track claim.claim) {<p>{{ claim.claim }} @if (claim.missing) {<small>Missing: {{ claim.missing }}</small>}</p>}@for (link of analysis.missingLinks || []; track link) {<p>{{ link }}</p>}@if (!analysis.partialClaims?.length && !analysis.missingLinks?.length) {<p class="muted">No partial claim returned.</p>}</div><div class="analysis-column"><span class="mini-label mini-label--red">Misconceptions</span>@for (claim of analysis.misconceptions || []; track claim.claim) {<p>{{ claim.claim }} <small>{{ claim.severity || 'review' }}</small></p>}@if (!analysis.misconceptions?.length) {<p class="muted">No misconception returned.</p>}</div></div>
+                @if (analysis.targetedQuestion) {<div class="question-callout"><strong>One next question</strong><span>{{ analysis.targetedQuestion }}</span></div>}
+              }
+            </section>
+          }
+        </div>
+      </div>
+
+      <section class="insight-grid" aria-label="Persisted learning evidence">
+        <article class="card insight-card" aria-labelledby="twin-title"><div class="card-heading"><div><p class="section-kicker">Update</p><h2 id="twin-title">Living Knowledge Twin</h2></div><span class="state-label">{{ learnerState()?.stateLabel || 'Unknown' }}</span></div><div class="twin-metrics"><div><span>Mastery</span><strong>{{ statePercent(learnerState()?.mastery) }}</strong></div><div><span>Uncertainty</span><strong>{{ statePercent(learnerState()?.uncertainty) }}</strong></div><div><span>Misconception</span><strong>{{ statePercent(learnerState()?.misconceptionSeverity) }}</strong></div><div><span>Attempts</span><strong>{{ learnerState()?.attempts ?? '—' }}</strong></div></div><dl class="evidence-dl"><div><dt>Confidence</dt><dd>{{ statePercent(learnerState()?.averageConfidence) }}</dd></div><div><dt>Transfer</dt><dd>{{ learnerState()?.transferSuccesses ?? '—' }} success · {{ learnerState()?.transferFailures ?? '—' }} fail</dd></div><div><dt>Scaffold</dt><dd>{{ learnerState()?.currentScaffoldLevel ?? '—' }} / 5</dd></div></dl><button class="button button--quiet" type="button" (click)="resetConcept()" [disabled]="busy() !== null || !learnerState()">Reset this concept</button></article>
+        <article class="card insight-card" aria-labelledby="memory-title"><div class="card-heading"><div><p class="section-kicker">Schedule</p><h2 id="memory-title">Memory Radar</h2></div><span class="estimate-tag">Estimate</span></div>@if (recallEstimate(); as estimate) {<div class="recall-score"><strong>{{ statePercent(recordNumber(estimate, 'estimatedRecall')) }}</strong><span>future recall estimate</span></div><p class="muted">{{ recordString(estimate, 'label') || 'Estimated recall, not a guarantee.' }}</p><p class="fine-print">Assumptions: recorded practice, correctness, confidence, and review timing. Model: {{ recordString(estimate, 'modelVersion') || 'deterministic scheduler' }}.</p>} @else {<div class="empty-state"><strong>Not enough retrieval history yet.</strong><span>After a persisted assessment, the service will show an estimate and its assumptions.</span></div>}<div class="review-list">@for (review of reviewItems(); track review.nextReviewAt) {<div><span>{{ review.level || 'review' }}</span><strong>{{ formatDate(review.nextReviewAt) }}</strong></div>} @empty {<p class="muted">No review schedule returned.</p>}</div></article>
+        <article class="card insight-card" aria-labelledby="analytics-title"><div class="card-heading"><div><p class="section-kicker">Household view</p><h2 id="analytics-title">Persisted analytics</h2></div><button class="icon-button" type="button" (click)="refreshDashboard()" aria-label="Refresh household analytics">↻</button></div>@if (analyticsEntries().length) {<dl class="analytics-list">@for (entry of analyticsEntries(); track entry[0]) {<div><dt>{{ contextLabel(entry[0]) }}</dt><dd>{{ entry[1] ?? '—' }}</dd></div>}</dl>} @else {<div class="empty-state"><strong>No analytics returned.</strong><span>Metrics appear only after persisted interaction events; constants are never shown as results.</span></div>}</article>
+      </section>
+
+      <section class="evidence-bar" aria-label="System evidence controls"><div><span class="section-kicker">Audit safely</span><strong>See the model call and deterministic state transition.</strong><span class="muted">No private prompts, tokens, raw reasoning, or another learner’s data.</span></div><div class="evidence-actions"><button class="button button--quiet" type="button" (click)="openEvidence()">Open System Evidence Drawer</button><button class="button button--quiet button--danger" type="button" (click)="resetEvaluator()" [disabled]="busy() !== null">Reset evaluator data</button></div></section>
+    } @else {
+      <section class="card empty-state profile-empty"><strong>Select a learner profile to continue.</strong><span>Profiles are loaded from the authenticated household service.</span></section>
+    }
+  }
 </main>
 
-<p class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
-  {{ liveStatus() }}
-</p>
-<p class="visually-hidden" role="alert" aria-live="assertive" aria-atomic="true">
-  {{ liveAlert() }}
-</p>
+@if (evidenceOpen()) {
+  <div class="drawer-backdrop" role="presentation" (click)="closeEvidence()"></div>
+  <aside class="evidence-drawer" role="dialog" aria-modal="true" aria-labelledby="evidence-title">
+    <div class="drawer-header"><div><p class="section-kicker">Safe operational proof</p><h2 id="evidence-title">System Evidence Drawer</h2></div><button class="icon-button" type="button" (click)="closeEvidence()" aria-label="Close evidence drawer">×</button></div>
+    @if (evidence(); as evidence) {
+      <div class="evidence-mode" [class.evidence-mode--fallback]="evidence.generationMode === 'curated_fallback'"><span aria-hidden="true">●</span><strong>{{ evidence.generationMode === 'curated_fallback' ? 'CURATED FALLBACK' : evidence.generationMode === 'live_model' ? 'LIVE MODEL' : 'DETERMINISTIC EVIDENCE' }}</strong></div>
+      @if (evidence.generationMode === 'curated_fallback') {<p class="fallback-copy">Curated fallback used because the live model was unavailable or its output was rejected.</p>}
+      <dl class="drawer-details"><div><dt>Feature</dt><dd>{{ evidence.feature || '—' }}</dd></div><div><dt>Provider</dt><dd>{{ evidence.provider || '—' }}</dd></div><div><dt>Model</dt><dd>{{ evidence.model || evidence.modelId || '—' }}</dd></div><div><dt>Request / trace</dt><dd class="mono">{{ evidence.requestId || evidence.traceId || '—' }}</dd></div><div><dt>Timestamp</dt><dd>{{ formatDate(evidence.generatedAt || evidence.timestamp) }}</dd></div><div><dt>Latency</dt><dd>{{ evidence.latencyMs !== undefined ? evidence.latencyMs + ' ms' : '—' }}</dd></div><div><dt>Schema validation</dt><dd>{{ evidence.schemaValid === undefined ? '—' : evidence.schemaValid ? 'Passed' : 'Rejected' }}</dd></div><div><dt>Safety validation</dt><dd>{{ evidence.safetyValid === undefined ? '—' : evidence.safetyValid ? 'Passed' : 'Rejected' }}</dd></div><div><dt>Source concept IDs</dt><dd class="mono">{{ evidence.sourceConceptIds?.join(', ') || '—' }}</dd></div><div><dt>Source invariant IDs</dt><dd class="mono">{{ evidence.sourceInvariantIds?.join(', ') || '—' }}</dd></div><div><dt>State before → after</dt><dd class="mono evidence-json">{{ evidence.stateBefore ? (evidence.stateBefore | json) : '—' }} → {{ evidence.stateAfter ? (evidence.stateAfter | json) : '—' }}</dd></div><div><dt>Deterministic reason</dt><dd>{{ evidence.deterministicReason || evidence.reason || '—' }}</dd></div></dl>
+    } @else {
+      <div class="empty-state"><strong>No evidence returned yet.</strong><span>After a live API step, this drawer shows safe metadata only.</span></div>
+    }
+  </aside>
+}
+
+<p class="visually-hidden" role="alert" aria-live="assertive" aria-atomic="true">{{ error() }}</p>
