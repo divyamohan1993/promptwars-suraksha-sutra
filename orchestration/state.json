@@ -1,12 +1,12 @@
 {
   "project": "SurakshaSutra",
-  "updatedAt": "2026-08-22T07:23:51Z",
+  "updatedAt": "2026-08-22T07:28:16Z",
   "phase": "wave-b-foundation",
   "releaseStatus": "blocked",
   "releaseBlockers": [
     "Application code and deployment artifacts do not yet exist.",
     "The VM service account has storage-read/logging/monitoring/trace scopes only; Firestore, Vertex AI, Service Usage, IAM, and Compute API calls are blocked by OAuth access scopes.",
-    "Google OAuth/Firebase web client configuration has not been provisioned or supplied.",
+    "The existing Firebase web app was discovered, but its public API key is expired and must be renewed before Firebase Authentication can work.",
     "Application deployment has not yet been built or started."
   ],
   "repositoryAudit": {
@@ -90,10 +90,50 @@
       "ownership": "read-only",
       "status": "stopped",
       "result": "Stopped after redundant long-running review; Sol completed architecture synthesis from A1-A3 and direct audit."
+    },
+    {
+      "taskId": "B1",
+      "agent": "/root/wave_b_monorepo",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "branch": "agent/b1-monorepo",
+      "worktree": "/home/divyamohan1993/promptwars-worktrees/b1-monorepo",
+      "ownership": "root build configuration, apps/api, apps/web, CI, README setup",
+      "status": "in_progress"
+    },
+    {
+      "taskId": "B2",
+      "agent": "/root/wave_b_contracts",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "branch": "agent/b2-contracts",
+      "worktree": "/home/divyamohan1993/promptwars-worktrees/b2-contracts",
+      "ownership": "packages/contracts only; exclusive public-contract owner",
+      "status": "in_progress"
+    },
+    {
+      "taskId": "B3",
+      "agent": "/root/wave_b_curriculum",
+      "model": "gpt-5.6-luna",
+      "effort": "max",
+      "branch": "agent/b3-curriculum",
+      "worktree": "/home/divyamohan1993/promptwars-worktrees/b3-curriculum",
+      "ownership": "packages/curriculum only",
+      "status": "in_progress"
     }
   ],
   "tests": [],
-  "deployments": [],
+  "deployments": [
+    {
+      "kind": "tls-certificate",
+      "host": "suraksha.34-0-15-183.sslip.io",
+      "issuer": "Let's Encrypt",
+      "issuedAt": "2026-08-22T07:28:16Z",
+      "expiresOn": "2026-11-20",
+      "autoRenewal": true,
+      "status": "provisioned-not-yet-serving-application"
+    }
+  ],
   "defectCounts": {
     "critical": 0,
     "high": 0,

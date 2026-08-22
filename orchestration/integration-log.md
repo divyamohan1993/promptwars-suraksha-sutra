@@ -37,3 +37,16 @@
 - Stopped A4 after its extended review duplicated settled requirements; Sol froze the repository module graph and contract ownership directly.
 - Persisted the review evidence and retained the known GCP/Firebase/TLS blockers.
 - Advanced orchestration to Wave B foundation; schema contracts are now exclusively owned by B2 until Sol freezes them.
+
+## 2026-08-22T07:25:33Z — Wave B started
+
+- Created isolated branches/worktrees `agent/b1-monorepo`, `agent/b2-contracts`, and `agent/b3-curriculum` from `main@1dae084`.
+- Spawned B1 for root/app/CI foundation, B2 as exclusive public Contract Agent, and B3 for approved curriculum and safety validation.
+- Paths are disjoint; no agent may edit another ownership zone or orchestration files.
+
+## 2026-08-22T07:28:16Z — Environment and TLS prepared
+
+- Recovered the existing Firebase web configuration from the project's public Firebase Hosting initialization endpoint and populated the ignored `.env` with runtime configuration and newly generated evaluator/reset/analytics secrets.
+- Verified the existing Firebase API key is expired through the Identity Toolkit API; authentication remains blocked until the key is renewed.
+- Selected `suraksha.34-0-15-183.sslip.io`, verified it resolves to the VM, and issued a trusted Let's Encrypt certificate valid through 2026-11-20 with automatic renewal.
+- Added reviewed bootstrap/HTTPS nginx templates, an edge installer, certificate verifier, and systemd container-service definition. The production proxy will be activated only after healthy application containers exist.

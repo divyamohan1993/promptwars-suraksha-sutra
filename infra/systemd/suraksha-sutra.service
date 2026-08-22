@@ -1,0 +1,18 @@
+[Unit]
+Description=SurakshaSutra production containers
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/srv/suraksha-sutra/current
+EnvironmentFile=/srv/suraksha-sutra/shared/.env
+ExecStart=/usr/bin/docker compose --env-file /srv/suraksha-sutra/shared/.env -f infra/compose/compose.prod.yml up -d --remove-orphans
+ExecStop=/usr/bin/docker compose --env-file /srv/suraksha-sutra/shared/.env -f infra/compose/compose.prod.yml down
+TimeoutStartSec=180
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
