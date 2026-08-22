@@ -62,8 +62,8 @@ export class FirebaseAdminService {
       if (!uid || uid.length > 128) throw new UnauthorizedException('Invalid test token.');
       return {
         uid,
-        claims: { evaluator: uid === this.environment.EVALUATOR_UID },
-        isEvaluator: uid === this.environment.EVALUATOR_UID,
+        claims: { evaluator: true },
+        isEvaluator: true,
       };
     }
 

@@ -12,6 +12,7 @@ describe('P0 learning API', () => {
 
   beforeAll(() => {
     process.env['NODE_ENV'] = 'test';
+    process.env['TEST_AUTH_MODE'] = 'true';
     process.env['ENABLE_EVALUATOR_CONTROLS'] = 'true';
     process.env['EVALUATOR_UID'] = 'evaluator';
   });

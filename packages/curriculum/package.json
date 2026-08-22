@@ -2,10 +2,20 @@
   "name": "@surakshasutra/curriculum",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.js",
-    "./safety": "./dist/safety-validator.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./safety": {
+      "types": "./dist/safety-validator.d.ts",
+      "require": "./dist/safety-validator.js",
+      "default": "./dist/safety-validator.js"
+    }
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

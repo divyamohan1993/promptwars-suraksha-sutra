@@ -8,7 +8,7 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
-      "@suraksha-sutra/contracts": ["../../packages/contracts/dist/src/index.d.ts"],
+      "@suraksha-sutra/contracts": ["../../packages/contracts/dist/index.d.ts"],
       "@surakshasutra/curriculum": ["../../packages/curriculum/dist/index.d.ts"]
     },
     "experimentalDecorators": true,
