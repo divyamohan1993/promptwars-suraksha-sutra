@@ -414,6 +414,14 @@ export class App implements OnInit {
     });
   }
 
+  useEvaluatorCredentials(): void {
+    const evaluator = this.auth.config()?.evaluatorAccess;
+    if (!evaluator) return;
+    this.email = evaluator.email;
+    this.password = evaluator.password;
+    this.notice.set('Public evaluator credentials filled. Select sign in to continue.');
+  }
+
   async signOut(): Promise<void> {
     await this.runTask('logout', async () => {
       await this.auth.logOut();

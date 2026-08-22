@@ -37,6 +37,13 @@ export class RuntimeConfigController {
         maxOutputTokens: environment.VERTEX_MAX_OUTPUT_TOKENS,
         timeoutMs: environment.VERTEX_TIMEOUT_MS,
       },
+      evaluatorAccess: environment.ENABLE_EVALUATOR_CONTROLS
+        ? {
+            label: 'Public hackathon evaluator account',
+            email: environment.EVALUATOR_EMAIL,
+            password: environment.EVALUATOR_PASSWORD,
+          }
+        : null,
       featureFlags: {
         adaptiveExplanation: true,
         teachBackAnalysis: true,

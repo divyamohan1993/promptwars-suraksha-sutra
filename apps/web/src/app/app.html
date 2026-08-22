@@ -76,6 +76,22 @@
         <span>{{ busy() === 'login' ? 'Connecting…' : 'Continue with Google' }}</span>
       </button>
       <div class="or-divider"><span>or evaluator sign-in</span></div>
+      @if (auth.config()?.evaluatorAccess; as evaluator) {
+      <aside class="evaluator-credentials" aria-label="Public evaluator credentials">
+        <strong>{{ evaluator.label || 'Public evaluator account' }}</strong>
+        <span>
+          Email:
+          <code>{{ evaluator.email }}</code>
+        </span>
+        <span>
+          Password:
+          <code>{{ evaluator.password }}</code>
+        </span>
+        <button class="button button--quiet" type="button" (click)="useEvaluatorCredentials()">
+          Fill evaluator credentials
+        </button>
+      </aside>
+      }
       <form
         class="stack"
         (ngSubmit)="signInWithPassword()"

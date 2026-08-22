@@ -28,6 +28,8 @@ export interface RuntimeEnvironment {
   readonly FIREBASE_STORAGE_BUCKET: string;
   readonly FIREBASE_GOOGLE_PROVIDER_ID: string;
   readonly FIREBASE_GOOGLE_CLIENT_ID: string;
+  readonly EVALUATOR_EMAIL: string;
+  readonly EVALUATOR_PASSWORD: string;
   readonly EVALUATOR_UID: string;
   readonly ENABLE_EVALUATOR_CONTROLS: boolean;
   readonly TEST_AUTH_MODE: boolean;
@@ -63,6 +65,8 @@ export function getRuntimeEnvironment(
     FIREBASE_STORAGE_BUCKET: config.get<string>('FIREBASE_STORAGE_BUCKET') ?? '',
     FIREBASE_GOOGLE_PROVIDER_ID: config.get<string>('FIREBASE_GOOGLE_PROVIDER_ID') ?? 'google.com',
     FIREBASE_GOOGLE_CLIENT_ID: config.get<string>('FIREBASE_GOOGLE_CLIENT_ID') ?? '',
+    EVALUATOR_EMAIL: config.get<string>('EVALUATOR_EMAIL') ?? '',
+    EVALUATOR_PASSWORD: config.get<string>('EVALUATOR_PASSWORD') ?? '',
     EVALUATOR_UID: config.get<string>('EVALUATOR_UID') ?? '',
     ENABLE_EVALUATOR_CONTROLS: config.get<boolean>('ENABLE_EVALUATOR_CONTROLS') ?? false,
     TEST_AUTH_MODE: config.get<boolean>('TEST_AUTH_MODE') ?? false,
@@ -221,6 +225,8 @@ export function validateRuntimeEnvironment(
       'google.com',
     ),
     FIREBASE_GOOGLE_CLIENT_ID: readString(environment, 'FIREBASE_GOOGLE_CLIENT_ID'),
+    EVALUATOR_EMAIL: readString(environment, 'EVALUATOR_EMAIL'),
+    EVALUATOR_PASSWORD: readString(environment, 'EVALUATOR_PASSWORD'),
     EVALUATOR_UID: readString(environment, 'EVALUATOR_UID'),
     ENABLE_EVALUATOR_CONTROLS: readBoolean(environment, 'ENABLE_EVALUATOR_CONTROLS', false),
     TEST_AUTH_MODE: readBoolean(environment, 'TEST_AUTH_MODE', mode === 'test'),

@@ -22,6 +22,11 @@ export type PublicRuntimeConfig = {
     readonly location?: string;
   };
   readonly featureFlags?: Record<string, boolean>;
+  readonly evaluatorAccess?: {
+    readonly label?: string;
+    readonly email: string;
+    readonly password: string;
+  } | null;
 };
 
 const requiredFirebaseKeys = ['apiKey', 'appId', 'projectId'] as const;
@@ -103,6 +108,22 @@ export class AuthService {
                   typeof record.model.location === 'string' ? record.model.location : undefined,
               }
             : undefined,
+          evaluatorAccess: isRecord(record.evaluatorAccess)
+            ? {
+                label:
+                  typeof record.evaluatorAccess.label === 'string'
+                    ? record.evaluatorAccess.label
+                    : undefined,
+                email:
+                  typeof record.evaluatorAccess.email === 'string'
+                    ? record.evaluatorAccess.email
+                    : '',
+                password:
+                  typeof record.evaluatorAccess.password === 'string'
+                    ? record.evaluatorAccess.password
+                    : '',
+              }
+            : null,
           featureFlags: isRecord(record.featureFlags)
             ? (Object.fromEntries(
                 Object.entries(record.featureFlags).filter(([, flag]) => typeof flag === 'boolean'),
