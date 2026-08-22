@@ -1,4 +1,19 @@
 {
-  "updatedAt": "2026-08-22T07:13:40Z",
-  "defects": []
+  "updatedAt": "2026-08-22T07:50:00Z",
+  "defects": [
+    {
+      "id": "SEC-001",
+      "severity": "high",
+      "status": "closed",
+      "title": "Nest configuration dependency resolved vulnerable lodash",
+      "evidence": "pnpm audit identified GHSA-r5fr-rjxr-66jc through @nestjs/config; workspace override upgraded lodash to 4.18.1; production audit reports no known vulnerabilities."
+    },
+    {
+      "id": "DEPLOY-001",
+      "severity": "high",
+      "status": "closed",
+      "title": "Web container restart caused by over-restrictive capability drop",
+      "evidence": "nginx could not initialize cache directories with all capabilities dropped; retained no-new-privileges for web, rebuilt/recreated it, and loopback HTTP became healthy."
+    }
+  ]
 }

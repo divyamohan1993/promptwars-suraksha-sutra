@@ -2,6 +2,9 @@ packages:
   - apps/*
   - packages/*
 
+overrides:
+  lodash: 4.18.1
+
 onlyBuiltDependencies:
   - '@parcel/watcher'
   - esbuild

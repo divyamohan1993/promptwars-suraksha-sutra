@@ -10,8 +10,13 @@ if [[ ! -f .env ]]; then
 fi
 
 export APP_VERSION="$(git rev-parse --short HEAD)"
-docker compose --env-file .env -f infra/compose/compose.prod.yml build
-docker compose --env-file .env -f infra/compose/compose.prod.yml up -d --remove-orphans
+docker_command=(docker)
+if ! docker info >/dev/null 2>&1; then
+  docker_command=(sudo docker)
+fi
+
+"${docker_command[@]}" compose --env-file .env -f infra/compose/compose.prod.yml build
+"${docker_command[@]}" compose --env-file .env -f infra/compose/compose.prod.yml up -d --remove-orphans
 
 for _ in $(seq 1 30); do
   if curl --fail --silent http://127.0.0.1:3000/api/v1/health >/dev/null \
@@ -24,7 +29,6 @@ for _ in $(seq 1 30); do
   sleep 2
 done
 
-docker compose --env-file .env -f infra/compose/compose.prod.yml ps
-docker compose --env-file .env -f infra/compose/compose.prod.yml logs --tail=100
+"${docker_command[@]}" compose --env-file .env -f infra/compose/compose.prod.yml ps
+"${docker_command[@]}" compose --env-file .env -f infra/compose/compose.prod.yml logs --tail=100
 exit 1
-

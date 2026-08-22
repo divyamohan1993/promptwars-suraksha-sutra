@@ -71,3 +71,9 @@
 - Created isolated branches/worktrees and spawned Luna Max C1 for the deterministic adaptive engine, C2 for the authenticated Firestore/Vertex API, and C3 for the connected Angular evaluator UI. Ownership is disjoint and frozen contracts remain read-only.
 - Added local production API/web container definitions, loopback-only port bindings, health checks, an HTTPS-gated deployment script, and explicit `.dockerignore` protection for `.env`.
 - Added the repository threat model and severity policy covering the browser, authentication/profile isolation, deterministic engine, Firestore, Vertex, evaluator controls, analytics, secret handling, and deployment boundaries.
+
+## 2026-08-22T07:50:00Z — Container preflight and dependency remediation
+
+- Corrected the contract declaration output root after a real consumer build exposed that package exports pointed at `dist/index` while declarations were emitted under `dist/src`; contract and curriculum consumer builds now pass.
+- Built both production images, started the loopback-bound API and web containers, verified API health, and corrected the web capability policy after nginx failed closed during startup. Both container endpoints respond locally.
+- A production dependency audit found a high-severity vulnerable lodash version through `@nestjs/config`. Upgraded the workspace resolution to lodash `4.18.1`; `pnpm audit --prod --audit-level high` now reports no known vulnerabilities.
