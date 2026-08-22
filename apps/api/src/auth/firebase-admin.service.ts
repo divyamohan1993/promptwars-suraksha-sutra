@@ -46,6 +46,7 @@ export class FirebaseAdminService {
           );
         this.auth = getAuth(this.app);
         this.firestore = getFirestore(this.app, this.environment.FIRESTORE_DATABASE_ID);
+        this.firestore.settings({ ignoreUndefinedProperties: true });
       } catch (error: unknown) {
         this.logger.error(`Firebase Admin initialization failed: ${safeErrorMessage(error)}`);
       }
