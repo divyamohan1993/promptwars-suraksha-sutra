@@ -30,7 +30,7 @@
 
 ## ADR-005 — Current cloud credential constraint
 
-- Status: accepted constraint
+- Status: superseded by ADR-014
 - Date: 2026-08-22
 - Decision: Continue implementation and local production deployment on the current VM. Do not weaken Firebase, Firestore, or Vertex requirements. Provision `.env` from discoverable runtime values and record any remaining credential input needed from the human.
 - Evidence: The attached service account token lacks `cloud-platform`, Firestore, and Vertex OAuth scopes; `gcloud services list` returns `ACCESS_TOKEN_SCOPE_INSUFFICIENT`.
@@ -91,3 +91,17 @@
 - Date: 2026-08-22
 - Decision: Supported language codes are `hi`, `en`, `hinglish`, and `hi_en`; session duration is `3..15` minutes; confidence is `0..1`; response time is `0..120000ms`; teach-back input is at most `2000` Unicode characters; event evidence references are capped at 50 per state record. A per-request forced model-failure mode is accepted only for the configured evaluator identity when evaluator controls are enabled, and is recorded as test evidence.
 - Reason: Bound resource use and provide the required truthful failure demonstration without a global production kill switch.
+
+## ADR-014 — Environment-file secret policy and runtime identity
+
+- Status: accepted by explicit human instruction
+- Date: 2026-08-22
+- Decision: Do not use Google Secret Manager. Keep all deploy-time credentials only in the repository-local ignored `.env`, restrict the file to mode `0600`, never commit or publish it, and inject it into the API container at runtime. Use a referrer- and API-restricted Firebase browser key for the frontend, a service-account-bound IP- and API-restricted key for Vertex AI, and a base64-encoded least-privilege runtime service-account credential for server-side Firestore OAuth. Logs, evidence, exports, and public configuration must redact these values.
+- Reason: The current human instruction explicitly requires `.env` and forbids Secret Manager. Firestore does not accept API keys, while the dedicated `suraksha-runtime` identity has only the roles required by Firestore, Vertex, logging, monitoring, tracing, Firebase Auth lookup, and analytics export.
+
+## ADR-015 — Named production data plane
+
+- Status: accepted
+- Date: 2026-08-22
+- Decision: Use the native Firestore database `projects/dmjone/databases/suraksha` in `asia-south2` with delete protection, BigQuery dataset `dmjone.suraksha_sutra` in `asia-south2`, Artifact Registry `asia-south2-docker.pkg.dev/dmjone/suraksha-sutra`, and Vertex model `gemini-3.5-flash-lite` in `global`. All identifiers come from `.env`; no production identifiers or credentials are hardcoded in application logic.
+- Reason: These resources are provisioned and independently preflighted for the dedicated runtime identity, removing the original cloud-access blocker without granting the VM's default identity broader permissions.

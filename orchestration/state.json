@@ -1,23 +1,22 @@
 {
   "project": "SurakshaSutra",
-  "updatedAt": "2026-08-22T07:28:16Z",
+  "updatedAt": "2026-08-22T07:43:10Z",
   "phase": "wave-b-foundation",
   "releaseStatus": "blocked",
   "releaseBlockers": [
-    "Application code and deployment artifacts do not yet exist.",
-    "The VM service account has storage-read/logging/monitoring/trace scopes only; Firestore, Vertex AI, Service Usage, IAM, and Compute API calls are blocked by OAuth access scopes.",
-    "The existing Firebase web app was discovered, but its public API key is expired and must be renewed before Firebase Authentication can work.",
+    "The application foundation is not yet integrated into main.",
+    "The connected P0 API and frontend journey are not yet implemented.",
     "Application deployment has not yet been built or started."
   ],
   "repositoryAudit": {
     "branch": "main",
-    "head": "fe84bf6d3ae5a1477b36d9033283181de4fe8b2c",
-    "worktree": "clean before orchestration artifacts",
-    "sourceState": "requirements-only repository",
-    "packageManager": "not configured",
-    "buildCommands": [],
-    "testCommands": [],
-    "architecture": "none",
+    "head": "fd0bb0595890f7fad2772d30f7fe9cf7015eef04",
+    "worktree": "clean; ignored .env mode 0600",
+    "sourceState": "foundation implementation in progress",
+    "packageManager": "pnpm 11.22.0",
+    "buildCommands": ["packages/contracts: pnpm build"],
+    "testCommands": ["packages/contracts: pnpm typecheck && pnpm test"],
+    "architecture": "strict TypeScript monorepo with Angular 21, NestJS 11, shared contract/curriculum/engine packages, containerized GCE edge",
     "deployment": {
       "platform": "Google Compute Engine",
       "project": "dmjone",
@@ -26,7 +25,9 @@
       "publicIp": "34.0.15.183",
       "machineType": "n2-standard-4",
       "httpTagsPresent": true,
-      "servicesListening": [22]
+      "servicesListening": [22, 80],
+      "publicHost": "suraksha.34-0-15-183.sslip.io",
+      "tlsCertificateExpiresOn": "2026-11-20"
     },
     "environment": {
       "os": "Ubuntu 26.04 on GCE",
@@ -50,9 +51,10 @@
     ]
   },
   "contracts": {
-    "status": "policy-frozen-schemas-pending",
-    "owner": "B2-contract-agent",
-    "changeRule": "Only B2 may change public contracts until Sol marks the schema package frozen."
+    "status": "frozen",
+    "owner": "Sol after B2 integration",
+    "commit": "fd0bb0595890f7fad2772d30f7fe9cf7015eef04",
+    "changeRule": "Only Sol may approve contract changes; engine agents must submit a contract change request."
   },
   "tasks": [
     {
@@ -99,7 +101,10 @@
       "branch": "agent/b1-monorepo",
       "worktree": "/home/divyamohan1993/promptwars-worktrees/b1-monorepo",
       "ownership": "root build configuration, apps/api, apps/web, CI, README setup",
-      "status": "in_progress"
+      "status": "completed-integrated",
+      "commit": "c6ad8718ee8b651f533a18cc10b0c66c663f56f2",
+      "integratedCommit": "35a7aab",
+      "verification": "Sol independently passed install, format, lint, typecheck, 4 tests, and production builds before integration."
     },
     {
       "taskId": "B2",
@@ -109,7 +114,10 @@
       "branch": "agent/b2-contracts",
       "worktree": "/home/divyamohan1993/promptwars-worktrees/b2-contracts",
       "ownership": "packages/contracts only; exclusive public-contract owner",
-      "status": "in_progress"
+      "status": "completed-integrated",
+      "commit": "42d4a971ed5a6e951a38fd3ad737c486f50363ee",
+      "integratedCommit": "fd0bb0595890f7fad2772d30f7fe9cf7015eef04",
+      "verification": "Sol independently passed typecheck, 20 contract tests with coverage, and build."
     },
     {
       "taskId": "B3",
@@ -119,10 +127,60 @@
       "branch": "agent/b3-curriculum",
       "worktree": "/home/divyamohan1993/promptwars-worktrees/b3-curriculum",
       "ownership": "packages/curriculum only",
-      "status": "in_progress"
+      "status": "completed-integrated",
+      "commit": "8936a73976f1d965f999ab7815d258aad23abb23",
+      "integratedCommit": "05dcb37",
+      "verification": "Sol inspected the complete diff and safety boundary; combined workspace gates pending after formatting integration."
     }
   ],
-  "tests": [],
+  "tests": [
+    {
+      "scope": "packages/contracts",
+      "command": "pnpm typecheck && pnpm test && pnpm build",
+      "status": "passed",
+      "evidence": "20/20 tests; 98.92% lines; 91.75% branches; strict typecheck and declaration build passed",
+      "verifiedAt": "2026-08-22T07:40:11Z"
+    },
+    {
+      "scope": "cloud-runtime-preflight",
+      "command": "restricted Vertex API key call and least-privilege Firestore service-account query",
+      "status": "passed",
+      "evidence": "Vertex HTTP 200 with schema-shaped JSON; Firestore HTTP 200 against named database",
+      "verifiedAt": "2026-08-22T07:38:45Z"
+    },
+    {
+      "scope": "apps/api and apps/web foundation",
+      "command": "pnpm install --frozen-lockfile && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+      "status": "passed",
+      "evidence": "2 API tests and 2 Angular tests passed; both production builds passed",
+      "verifiedAt": "2026-08-22T07:41:42Z"
+    }
+  ],
+  "cloudResources": {
+    "firebaseAuth": {
+      "status": "active",
+      "providers": ["google.com", "password"],
+      "authorizedHost": "suraksha.34-0-15-183.sslip.io",
+      "evaluatorAccount": "created-and-sign-in-verified"
+    },
+    "firestore": {
+      "database": "suraksha",
+      "location": "asia-south2",
+      "deleteProtection": true,
+      "runtimeAuthorization": "least-privilege service account credential from ignored .env"
+    },
+    "vertexAi": {
+      "model": "gemini-3.5-flash-lite",
+      "location": "global",
+      "runtimeAuthorization": "service-account-bound API key from ignored .env",
+      "preflight": "passed"
+    },
+    "bigQuery": {
+      "dataset": "suraksha_sutra",
+      "location": "asia-south2"
+    },
+    "artifactRegistry": "asia-south2-docker.pkg.dev/dmjone/suraksha-sutra"
+  },
   "deployments": [
     {
       "kind": "tls-certificate",

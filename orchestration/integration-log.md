@@ -50,3 +50,18 @@
 - Verified the existing Firebase API key is expired through the Identity Toolkit API; authentication remains blocked until the key is renewed.
 - Selected `suraksha.34-0-15-183.sslip.io`, verified it resolves to the VM, and issued a trusted Let's Encrypt certificate valid through 2026-11-20 with automatic renewal.
 - Added reviewed bootstrap/HTTPS nginx templates, an edge installer, certificate verifier, and systemd container-service definition. The production proxy will be activated only after healthy application containers exist.
+
+## 2026-08-22T07:40:40Z — Cloud data plane, authentication, and contracts ready
+
+- Replaced the expired Firebase key with a dedicated browser key restricted to the production host, localhost, and the Firebase authentication APIs; enabled and live-tested Google one-click plus email/password sign-in.
+- Added the public host to Identity Platform, created the isolated evaluator account, verified its credentials, and assigned only the evaluator custom claim. Secrets remain solely in the ignored mode-`0600` `.env`.
+- Provisioned the delete-protected native Firestore database `suraksha`, regional BigQuery dataset `suraksha_sutra`, immutable-tag Artifact Registry repository, and least-privilege `suraksha-runtime` service account.
+- Verified a live `gemini-3.5-flash-lite` Vertex call with the restricted service-account-bound API key. Verified an authenticated Firestore query with the `.env` service-account credential. Secret Manager is intentionally not used per current human instruction.
+- Received B2 commit `42d4a971ed5a6e951a38fd3ad737c486f50363ee`, inspected its full schema surface and path ownership, independently passed strict typechecking, 20 contract tests with coverage, and build, then integrated it as `fd0bb0595890f7fad2772d30f7fe9cf7015eef04`.
+- Public contracts are frozen. Further changes require Sol approval and an explicit change request.
+
+## 2026-08-22T07:43:10Z — Foundation applications and curriculum integrated
+
+- Received B1 commit `c6ad8718ee8b651f533a18cc10b0c66c663f56f2`, inspected root/app/CI changes and credential patterns, independently passed frozen install, format, lint, typecheck, four tests, and Angular/Nest production builds, then integrated it as `35a7aab`.
+- Received B3 commit `8936a73976f1d965f999ab7815d258aad23abb23`, inspected all curriculum-only paths plus the fail-closed safety validator, and integrated it as `05dcb37` after contracts were frozen.
+- Removed the Contract Agent's standalone package lock/workspace files, regenerated the single root lockfile, normalized the public `.env.example` to the accepted `.env` runtime contract, and formatted integrated contract sources under the root policy.
