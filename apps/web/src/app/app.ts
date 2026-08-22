@@ -371,6 +371,8 @@ export class App implements OnInit {
   readonly forceFallback = signal(false);
   readonly householdName = signal('');
   readonly profileExported = signal(false);
+  readonly demoRunning = signal(false);
+  readonly demoCaption = signal('');
 
   email = '';
   password = '';
@@ -420,6 +422,117 @@ export class App implements OnInit {
     this.email = evaluator.email;
     this.password = evaluator.password;
     this.notice.set('Public evaluator credentials filled. Select sign in to continue.');
+  }
+
+  async runAutomatedDemo(): Promise<void> {
+    if (this.demoRunning()) return;
+    const evaluator = this.auth.config()?.evaluatorAccess;
+    if (!evaluator) return;
+    this.demoRunning.set(true);
+    try {
+      this.demoCaption.set('LIVE TEST · Entering the public evaluator credentials');
+      this.email = '';
+      this.password = '';
+      await this.demoType(evaluator.email, (value) => (this.email = value), 30);
+      await this.demoWait(700);
+      await this.demoType(evaluator.password, (value) => (this.password = value), 25);
+      await this.demoWait(1_200);
+      await this.signInWithPassword();
+      await this.demoWait(2_000);
+      this.demoCaption.set('THREE ISOLATED PROFILES · Resettable evaluator data');
+      await this.resetEvaluator();
+      this.demoScroll('#constitution-title');
+      await this.demoWait(4_000);
+      this.demoCaption.set('LEARNER CONTROL · Hindi, accessibility, consent and personalisation');
+      await this.saveConstitution();
+      this.demoScroll('#diagnostic-title');
+      await this.demoWait(4_000);
+      this.demoCaption.set('EDGE CASE · Incorrect answer with 95% confidence');
+      const wrong =
+        this.diagnostic()?.choices.find((choice) => choice.classification === 'unsafe') ??
+        this.diagnostic()?.choices[0];
+      if (wrong) this.setDiagnosticChoice(wrong.id);
+      this.confidence.set(0.95);
+      await this.demoWait(2_500);
+      await this.submitDiagnostic();
+      this.demoScroll('#route-title');
+      await this.demoWait(4_500);
+      this.demoCaption.set('DETERMINISTIC ADAPTATION · Deep Route and scaffold level 2');
+      this.chooseRoute('deep');
+      this.chooseScaffold(2);
+      await this.demoWait(2_500);
+      await this.startLesson();
+      this.demoScroll('#lesson-title');
+      this.demoCaption.set('GENAI IN ACTION · Vertex AI adapts approved content to this learner');
+      await this.demoWait(6_000);
+      this.openEvidence();
+      this.demoCaption.set('AI EVIDENCE · Model, request ID, latency, validation and sources');
+      await this.demoWait(7_000);
+      this.closeEvidence();
+      this.demoScroll('#scenario-title');
+      this.demoCaption.set(
+        'SAFE SIMULATOR · Fictional training with no active links or credentials',
+      );
+      const baseChoice = this.activeScenario()?.safestChoiceId;
+      if (baseChoice) this.setScenarioChoice(baseChoice);
+      await this.demoWait(3_000);
+      await this.submitScenario();
+      await this.demoWait(4_000);
+      this.demoCaption.set('TRANSFER TEST · Same invariant in a different context');
+      const transferChoice = this.activeScenario()?.safestChoiceId;
+      if (transferChoice) this.setScenarioChoice(transferChoice);
+      await this.demoWait(3_000);
+      await this.submitScenario();
+      this.demoScroll('#teachback-title');
+      await this.demoWait(2_500);
+      this.demoCaption.set('LIVE TEACH-BACK · Claims, gaps and one targeted question');
+      const explanation =
+        'Receiving money never requires me to approve an outgoing payment. I should pause and verify independently instead of trusting urgency or familiar colours.';
+      this.teachBackText.set('');
+      await this.demoType(explanation, (value) => this.teachBackText.set(value), 16);
+      await this.demoWait(1_500);
+      await this.submitTeachBack();
+      await this.demoWait(6_000);
+      this.demoCaption.set('VERIFIED LEARNING · Knowledge Twin, Memory Radar and analytics');
+      this.demoScroll('#twin-title');
+      await this.demoWait(7_000);
+      this.demoCaption.set('PROFILE ISOLATION · Arjun has independent preferences and state');
+      await this.selectProfile('profile-arjun');
+      this.demoScroll('#constitution-title');
+      await this.demoWait(5_000);
+      await this.selectProfile('profile-savita');
+      this.demoCaption.set('FAILURE TEST · Truthfully labelled curated fallback');
+      this.toggleFallback();
+      await this.startLesson();
+      this.demoScroll('#lesson-title');
+      await this.demoWait(6_000);
+      this.openEvidence();
+      await this.demoWait(7_000);
+      this.closeEvidence();
+      this.demoCaption.set(
+        'DEMO COMPLETE · Observe → estimate → teach → assess → update → revisit',
+      );
+      await this.demoWait(5_000);
+    } finally {
+      this.demoRunning.set(false);
+    }
+  }
+
+  private async demoType(text: string, update: (value: string) => void, delay: number) {
+    let value = '';
+    for (const character of text) {
+      value += character;
+      update(value);
+      await this.demoWait(delay);
+    }
+  }
+
+  private demoWait(delay: number): Promise<void> {
+    return new Promise((resolve) => window.setTimeout(resolve, delay));
+  }
+
+  private demoScroll(selector: string): void {
+    document.querySelector(selector)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   async signOut(): Promise<void> {

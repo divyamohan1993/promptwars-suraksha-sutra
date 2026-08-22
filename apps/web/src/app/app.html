@@ -26,6 +26,9 @@
 </header>
 
 <main id="main-content" class="app-main" tabindex="-1">
+  @if (demoCaption()) {
+  <div class="demo-caption" role="status">{{ demoCaption() }}</div>
+  }
   <section class="hero-strip" aria-labelledby="hero-title">
     <div>
       <p class="eyebrow">Digital safety · भारत के घरों के लिए</p>
@@ -89,6 +92,14 @@
         </span>
         <button class="button button--quiet" type="button" (click)="useEvaluatorCredentials()">
           Fill evaluator credentials
+        </button>
+        <button
+          class="button button--primary"
+          type="button"
+          (click)="runAutomatedDemo()"
+          [disabled]="demoRunning()"
+        >
+          {{ demoRunning() ? 'Automated demo running…' : 'Start automated recording demo' }}
         </button>
       </aside>
       }

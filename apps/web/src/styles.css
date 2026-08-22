@@ -381,6 +381,24 @@ a {
   justify-self: start;
   margin-top: 0.25rem;
 }
+.demo-caption {
+  position: fixed;
+  z-index: 1000;
+  right: 1rem;
+  bottom: 1rem;
+  left: 1rem;
+  max-width: 70rem;
+  margin: auto;
+  padding: 0.85rem 1rem;
+  border: 2px solid #fff;
+  border-radius: 0.75rem;
+  color: #fff;
+  background: #102d25ee;
+  box-shadow: 0 0.8rem 2rem #102d2540;
+  font-size: clamp(0.9rem, 1.8vw, 1.2rem);
+  font-weight: 800;
+  text-align: center;
+}
 .field {
   display: grid;
   gap: 0.35rem;
