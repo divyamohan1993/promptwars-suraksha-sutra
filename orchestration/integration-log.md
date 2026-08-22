@@ -77,3 +77,9 @@
 - Corrected the contract declaration output root after a real consumer build exposed that package exports pointed at `dist/index` while declarations were emitted under `dist/src`; contract and curriculum consumer builds now pass.
 - Built both production images, started the loopback-bound API and web containers, verified API health, and corrected the web capability policy after nginx failed closed during startup. Both container endpoints respond locally.
 - A production dependency audit found a high-severity vulnerable lodash version through `@nestjs/config`. Upgraded the workspace resolution to lodash `4.18.1`; `pnpm audit --prod --audit-level high` now reports no known vulnerabilities.
+
+## 2026-08-22T07:54:50Z — Deterministic adaptive engine integrated
+
+- Received C1 commit `c0b60e50c0250784cb2209484a1d66b462269b26`, inspected its full public API and ownership, and integrated it as `27069b1`.
+- Independently passed strict typechecking, 22 deterministic-policy tests with 91.35% line and 97.72% function coverage, and the package build. Model-provided mastery is rejected by the engine boundary.
+- Used the browser-verification workflow on the local production-shaped web container: page content rendered, no framework overlay or browser errors appeared, interactive semantics were present, and a screenshot was inspected. Full journey verification remains gated on C2/C3 integration.

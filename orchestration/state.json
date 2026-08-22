@@ -1,6 +1,6 @@
 {
   "project": "SurakshaSutra",
-  "updatedAt": "2026-08-22T07:50:00Z",
+  "updatedAt": "2026-08-22T07:54:50Z",
   "phase": "wave-b-foundation",
   "releaseStatus": "blocked",
   "releaseBlockers": [
@@ -140,7 +140,10 @@
       "branch": "agent/c1-adaptive-engine",
       "worktree": "/home/divyamohan1993/promptwars-worktrees/c1-adaptive-engine",
       "ownership": "packages/adaptive-engine only",
-      "status": "in_progress"
+      "status": "completed-integrated",
+      "commit": "c0b60e50c0250784cb2209484a1d66b462269b26",
+      "integratedCommit": "27069b1",
+      "verification": "Sol independently passed strict typecheck, 22 tests with 91.35% line coverage, and build."
     },
     {
       "taskId": "C2",
@@ -184,6 +187,13 @@
       "status": "passed",
       "evidence": "2 API tests and 2 Angular tests passed; both production builds passed",
       "verifiedAt": "2026-08-22T07:41:42Z"
+    },
+    {
+      "scope": "packages/adaptive-engine",
+      "command": "pnpm typecheck && pnpm test && pnpm build",
+      "status": "passed",
+      "evidence": "22/22 deterministic-policy tests; 91.35% lines; 97.72% functions",
+      "verifiedAt": "2026-08-22T07:54:50Z"
     }
   ],
   "cloudResources": {
