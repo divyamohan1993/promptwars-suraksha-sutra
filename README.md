@@ -1,5 +1,36 @@
 # SurakshaSutra Orchestration Pack
 
+## Local foundation setup
+
+The application is a strict pnpm workspace with two independently buildable applications:
+
+- `apps/web` — Angular 21.2 PWA shell.
+- `apps/api` — NestJS 11 HTTP API.
+
+Node.js 22.22.1 (or a compatible Node 22.12+ release) and pnpm 11.22.0 are required.
+
+```bash
+pnpm install --frozen-lockfile
+pnpm format:check
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+```
+
+Copy `.env.example` to `.env` and provide environment-specific values through the runtime secret
+manager or local environment. The example file intentionally contains names only. Production CORS
+origins must be explicit HTTPS origins; wildcard origins are rejected by the API boundary.
+
+The API listens on the configured `PORT` and exposes:
+
+- `GET /api/v1/health` — process health and uptime.
+- `GET /api/v1/ready` — validated runtime configuration readiness.
+
+The Angular shell is available with `pnpm --filter @surakshasutra/web start`, and the API is
+available with `pnpm --filter @surakshasutra/api start:dev`. The PWA service worker is enabled for
+production builds and disabled during development.
+
 Place all files in the repository root before starting Codex.
 
 ## File roles

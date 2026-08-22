@@ -1,0 +1,24 @@
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<header class="app-header" aria-labelledby="application-title">
+  <div class="app-header__inner">
+    <a class="brand" routerLink="/" aria-label="SurakshaSutra home">
+      <span class="brand__mark" aria-hidden="true">स</span>
+      <span>
+        <span class="brand__title" id="application-title">SurakshaSutra</span>
+        <span class="brand__subtitle">Learner-owned digital safety</span>
+      </span>
+    </a>
+  </div>
+</header>
+
+<main id="main-content" class="app-main" tabindex="-1">
+  <router-outlet />
+</main>
+
+<p class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+  {{ liveStatus() }}
+</p>
+<p class="visually-hidden" role="alert" aria-live="assertive" aria-atomic="true">
+  {{ liveAlert() }}
+</p>

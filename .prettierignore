@@ -1,0 +1,18 @@
+node_modules/
+dist/
+coverage/
+.angular/
+out-tsc/
+tmp/
+pnpm-lock.yaml
+
+# Organizer and orchestration records are immutable evidence.
+AGENTS.md
+challenge.md
+idea.md
+parameter-impact.md
+what-to-do.md
+orchestration/
+.env.example
+.npmrc
+.prettierignore

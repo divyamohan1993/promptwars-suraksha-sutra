@@ -1,1 +1,24 @@
+# Local secrets and runtime configuration
 .env
+.env.*
+!.env.example
+!.env.*.example
+
+# Dependencies and package-manager state
+node_modules/
+.pnpm-store/
+
+# Build, test, and framework output
+dist/
+coverage/
+.angular/
+.nx/
+out-tsc/
+tmp/
+*.tsbuildinfo
+
+# Logs and local tooling
+*.log
+.cache/
+.eslintcache
+.DS_Store

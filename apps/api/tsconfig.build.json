@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "removeComments": true
+  },
+  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts", "dist", "node_modules"]
+}
