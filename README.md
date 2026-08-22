@@ -18,9 +18,9 @@ pnpm test
 pnpm build
 ```
 
-Copy `.env.example` to `.env` and provide environment-specific values through the runtime secret
-manager or local environment. The example file intentionally contains names only. Production CORS
-origins must be explicit HTTPS origins; wildcard origins are rejected by the API boundary.
+Copy `.env.example` to `.env` and provide environment-specific values through that ignored local
+file. The example intentionally contains names only; never commit populated values. Production
+CORS origins must be explicit HTTPS origins, and the API boundary rejects wildcard origins.
 
 The API listens on the configured `PORT` and exposes:
 
@@ -40,6 +40,8 @@ Place all files in the repository root before starting Codex.
 - `what-to-do.md` — anti-disqualification rules converted into operational evidence and submission gates.
 - `parameter-impact.md` — strict, measurable release criteria for all six scoring parameters.
 - `idea.md` — machine-oriented product, adaptive-learning, data, safety, and acceptance specification.
+- `TECH_STACK.md` — deployed technologies, GenAI usage, adaptive mechanisms, and security boundaries.
+- `PROMPTS.md` — verbatim deployed Vertex prompts and clearly separated recommended prompt revisions.
 
 ## Important corrections
 

@@ -2,7 +2,7 @@
 
 Keep the complete recording under four minutes.
 
-Live app: <https://suraksha.34-0-15-183.sslip.io>
+Live app: <https://sutra.dmj.one>
 
 To display the evaluator credentials locally:
 
@@ -71,7 +71,7 @@ Point out:
 
 Say:
 
-> Vertex AI adapts approved instructional content to Savita's constitution and current misconception. It cannot directly set learner mastery.
+> Vertex AI adapts approved instructional content to Savita's selected language, route, and scaffold level. It cannot directly set learner mastery.
 
 ## 2:10–2:50 — Simulator and transfer
 
