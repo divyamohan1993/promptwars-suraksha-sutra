@@ -20,13 +20,21 @@ export class SafeExceptionFilter implements ExceptionFilter {
     const response = context.getResponse<Response>();
     const request = context.getRequest<TraceableRequest>();
     const statusCode =
-      exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : isZodError(exception)
+          ? HttpStatus.BAD_REQUEST
+          : HttpStatus.INTERNAL_SERVER_ERROR;
     const traceId = request.traceId ?? 'unavailable';
     const envelope: ApiErrorEnvelope = {
       statusCode,
       errorCode: statusCode >= 500 ? 'INTERNAL_ERROR' : 'REQUEST_ERROR',
       message:
-        statusCode >= 500 ? 'The request could not be completed.' : getClientMessage(exception),
+        statusCode >= 500
+          ? 'The request could not be completed.'
+          : isZodError(exception)
+            ? 'The request payload is invalid.'
+            : getClientMessage(exception),
       traceId,
       timestamp: new Date().toISOString(),
       path: request.originalUrl,
@@ -34,6 +42,15 @@ export class SafeExceptionFilter implements ExceptionFilter {
 
     response.status(statusCode).json(envelope);
   }
+}
+
+function isZodError(value: unknown): value is { readonly issues: readonly unknown[] } {
+  return Boolean(
+    value &&
+    typeof value === 'object' &&
+    (value as { readonly name?: unknown }).name === 'ZodError' &&
+    Array.isArray((value as { readonly issues?: unknown }).issues),
+  );
 }
 
 function getClientMessage(exception: HttpException | unknown): string {

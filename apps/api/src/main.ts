@@ -7,7 +7,7 @@ import helmet from 'helmet';
 import { json } from 'express';
 
 import { AppModule } from './app.module';
-import type { RuntimeEnvironment } from './config/runtime-environment';
+import { getRuntimeEnvironment, type RuntimeEnvironment } from './config/runtime-environment';
 import { SafeExceptionFilter } from './http/safe-exception.filter';
 import { traceIdMiddleware } from './http/trace-id.middleware';
 
@@ -16,13 +16,7 @@ async function bootstrap(): Promise<void> {
     bufferLogs: true,
   });
   const configService = app.get(ConfigService<RuntimeEnvironment>);
-  const environment: RuntimeEnvironment = {
-    NODE_ENV: configService.getOrThrow<RuntimeEnvironment['NODE_ENV']>('NODE_ENV'),
-    PORT: configService.getOrThrow<number>('PORT'),
-    API_PREFIX: configService.getOrThrow<string>('API_PREFIX'),
-    CORS_ORIGINS: configService.getOrThrow<readonly string[]>('CORS_ORIGINS'),
-    REQUEST_BODY_LIMIT: configService.getOrThrow<string>('REQUEST_BODY_LIMIT'),
-  };
+  const environment: RuntimeEnvironment = getRuntimeEnvironment(configService);
 
   app.use(traceIdMiddleware);
   app.use(helmet());
